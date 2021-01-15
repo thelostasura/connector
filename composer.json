@@ -1,0 +1,45 @@
+{
+    "name": "thelostasura/connector",
+    "authors": [
+        {
+            "name": "thelostasura",
+            "email": "mail@thelostasura.com"
+        }
+    ],
+    "type": "project",
+    "require": {
+        "catfan/medoo": "^1.7",
+        "guzzlehttp/guzzle": "^7.2",
+        "illuminate/cache": "^8.21",
+        "illuminate/container": "^8.21",
+        "illuminate/filesystem": "^8.21",
+        "illuminate/http": "^8.21"
+    },
+    "autoload": {
+        "psr-4": {
+            "TheLostAsura\\Connector\\": "app/"
+        },
+        "classmap": [
+            "database/migrations/"
+        ]
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "i18n": [
+            "php ../wp i18n make-pot . languages/asura-connector-en_US.pot"
+        ],
+        "i18n-json": [
+            "@php -r \"copy('languages/asura-connector-en_US.pot', 'languages/asura-connector-en_US.po');\"",
+            "php ../wp i18n make-json languages/ --pretty-print --purge"
+        ],
+        "i18n-compile": [
+            "..\\msgfmt.exe -o languages/asura-connector-en_US.mo languages/asura-connector-en_US.pot"
+        ]
+    }
+}
