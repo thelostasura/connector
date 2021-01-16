@@ -11,5 +11,4 @@ mix
     postCss: [ tailwindcss('./tailwind.config.js') ],
   })
   .copy('resources/img', 'public')
-
   .disableNotifications();

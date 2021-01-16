@@ -27,8 +27,6 @@ defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use TheLostAsura\Connector\Models\License;
-use TheLostAsura\Connector\Models\Provider;
 use TheLostAsura\Connector\Utils\Migration;
 
 /**

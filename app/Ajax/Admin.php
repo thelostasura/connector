@@ -3,6 +3,8 @@
 namespace TheLostAsura\Connector\Ajax;
 
 use Illuminate\Support\Carbon;
+use TheLostAsura\Connector\Lib\Asura;
+use TheLostAsura\Connector\Models\License;
 use TheLostAsura\Connector\Models\Provider;
 use TheLostAsura\Connector\Utils\DB;
 use WP_Error;
@@ -43,7 +45,15 @@ class Admin {
             'edit_provider' => [
                 'handler' => [ $this, 'edit_provider' ]
             ],
-
+            'list_licenses' => [
+                'handler' => [ $this, 'list_licenses' ]
+            ],
+            'add_license' => [
+                'handler' => [ $this, 'add_license' ]
+            ],
+            'delete_license' => [
+                'handler' => [ $this, 'delete_license' ]
+            ],
         ];
 
         return $ajaxs;
@@ -205,6 +215,10 @@ class Admin {
 
         DB::delete(Provider::TABLE_NAME, [
             'id' => $id,
+        ]);
+
+        DB::delete(License::TABLE_NAME, [
+            'provider_id' => $id
         ]);
             
         wp_send_json_success();
@@ -368,6 +382,268 @@ class Admin {
             wp_send_json_success($update);
         }
 
+        wp_die();
+    }
+
+    public function list_licenses() {
+        check_ajax_referer( 'asura-connector-admin' );
+
+        if ( empty( $_REQUEST[ 'provider_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The provider id is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        } else if ( ! is_numeric( $_REQUEST[ 'provider_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'invalid_field', 
+                    __( 'The provider id should numeric', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
+        
+        $id = $_REQUEST[ 'provider_id' ];
+
+        $exist = DB::get(Provider::TABLE_NAME, [
+            'id [Int]',
+        ], [
+            'id' => $id,
+        ]);
+
+        if ( ! $exist ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'record_not_exist', 
+                    __( 'The provider id is not exist', 'asura-connector' ) 
+                ),
+                404
+            );
+        }
+
+        $licenses = DB::select(
+            License::TABLE_NAME,
+            [
+                'id [Int]',
+                'provider_id',
+                'license',
+                'status [Bool]',
+                'created_at',
+                'updated_at'
+            ],
+            [
+                'provider_id' => $id,
+                'ORDER' => [ 'id' => 'DESC' ],
+            ]
+        );
+
+        wp_send_json_success($licenses);
+
+        wp_die();
+    }
+
+    public function add_license() {
+        check_ajax_referer( 'asura-connector-admin' );
+
+        if ( empty( $_REQUEST[ 'provider_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The provider id is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        } else if ( ! is_numeric( $_REQUEST[ 'provider_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'invalid_field', 
+                    __( 'The provider id should numeric', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
+        
+        $id = $_REQUEST[ 'provider_id' ];
+
+        $provider = DB::get(Provider::TABLE_NAME, [
+            'id [Int]',
+            'provider',
+            'site_title',
+            'api_key',
+            'api_secret',
+            'endpoint',
+            'version',
+            'status [Bool]',
+            'created_at',
+            'updated_at'
+        ], [
+            'id' => $id,
+        ]);
+
+        if ( ! $provider ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'record_not_exist', 
+                    __( 'The provider id is not exist', 'asura-connector' ) 
+                ),
+                404
+            );
+        }
+
+        
+        if ( empty( $_REQUEST[ 'license_key' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The license key field is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
+
+        $license_key = $_REQUEST[ 'license_key' ];
+
+        $response = Asura::license_domains_register((object) $provider, $license_key);
+
+        $body = json_decode($response->body(), true);
+
+        if( $response->status() !== 200 ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    key($body), 
+                    array_values($body)[0] 
+                ),
+                $response->status()
+            );
+        }
+
+        $insert = DB::insert(License::TABLE_NAME, [
+            'provider_id' => $id,
+            'license' => $license_key,
+            'hash' => $body['data'][0]['hash'],
+            'status' => 1,
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString(),
+        ]);
+
+        if ( ! $insert ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'internal_error', 
+                    __( 'Failed to add the provider to database', 'asura-connector' ) 
+                ),
+                500
+            );
+        }
+
+        wp_send_json_success($insert);
+    
+        wp_die();
+    }
+
+    public function delete_license() {
+        check_ajax_referer( 'asura-connector-admin' );
+
+        if ( empty( $_REQUEST[ 'provider_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The provider id is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        } else if ( ! is_numeric( $_REQUEST[ 'provider_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'invalid_field', 
+                    __( 'The provider id should numeric', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
+        
+        $id = $_REQUEST[ 'provider_id' ];
+
+        $provider = DB::get(Provider::TABLE_NAME, [
+            'id [Int]',
+            'provider',
+            'site_title',
+            'api_key',
+            'api_secret',
+            'endpoint',
+            'version',
+            'status [Bool]',
+            'created_at',
+            'updated_at'
+        ], [
+            'id' => $id,
+        ]);
+
+        if ( ! $provider ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'record_not_exist', 
+                    __( 'The provider id is not exist', 'asura-connector' ) 
+                ),
+                404
+            );
+        }
+        
+        if ( empty( $_REQUEST[ 'license_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The license id is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
+
+        $license_id = $_REQUEST[ 'license_id' ];
+
+        $license = DB::get(License::TABLE_NAME, [
+            'id [Int]',
+            'provider_id [Int]',
+            'license'
+        ], [
+            'id' => $license_id,
+            'provider_id' => $id,
+        ]);
+
+        if ( ! $license ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'record_not_exist', 
+                    __( 'The license id is not exist', 'asura-connector' ) 
+                ),
+                404
+            );
+        }
+
+        $response = Asura::license_domains_deregister((object) $provider, $license['license']);
+
+        $body = json_decode($response->body(), true);
+
+        if( $response->status() !== 200 ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    key($body), 
+                    array_values($body)[0] 
+                ),
+                $response->status()
+            );
+        }
+
+        $delete = DB::delete(License::TABLE_NAME, [
+            'id' => $license_id,
+            'provider_id' => $id
+        ]);
+
+        wp_send_json_success($delete);
+    
         wp_die();
     }
 

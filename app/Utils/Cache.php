@@ -38,7 +38,7 @@ class Cache
         self::$cache = $cacheManager->store();
 
         // Or, if you have multiple drivers:
-        // $cache = $cacheManager->store('file');
+        // self::$cache = $cacheManager->store('file');
     }
     
     protected function __clone() { }

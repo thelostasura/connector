@@ -18,9 +18,9 @@ class Migration
                 $fileVersion    = $match[5];
                 $fileName       = $match[6];
 
-                if ( intval( $fileVersion ) <= intval( $newDatabaseVersion ) && intval( $fileVersion ) > intval( $currentDatabaseVersion ) ) {
+                if (intval($fileVersion) <= intval($newDatabaseVersion) && intval($fileVersion) > intval($currentDatabaseVersion)) {
                     $className = self::camelize($fileName);
-                    call_user_func( [ "\\TheLostAsura\\Connector\\Database\\Migrations\\{$className}", 'up' ] );
+                    call_user_func(["\\TheLostAsura\\Connector\\Database\\Migrations\\{$className}", 'up']);
                 }
             }
         }
@@ -28,7 +28,6 @@ class Migration
 
     public static function rollback()
     {
-
     }
 
     public static function camelize($input, $separator = '_')
