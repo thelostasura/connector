@@ -65,7 +65,7 @@ class Admin
      */
     public function enqueue_scripts()
     {
-        wp_enqueue_style('connector-style');
+        wp_enqueue_style('asura-connector-admin');
         wp_enqueue_script('asura-connector-admin');
         wp_set_script_translations('asura-connector-admin', 'asura-connector', ASURA_CONNECTOR_PATH . '/languages/');
         wp_localize_script(

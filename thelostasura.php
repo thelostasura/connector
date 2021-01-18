@@ -158,7 +158,7 @@ final class Asura_Connector {
 	 */
 	public function init_hooks() {
 		// Localize our plugin
-		add_action( 'init', [ $this, 'localization_setup' ] );
+		add_action( 'init', [ $this, 'localization_setup' ], 100 );
 
 		add_action( 'init', [ $this, 'init_classes' ] );
 	}
@@ -169,6 +169,9 @@ final class Asura_Connector {
 	 * @return void
 	 */
 	public function init_classes() {
+
+		$this->container['assets'] = new TheLostAsura\Connector\Assets();
+//		$this->container['api'] = new TheLostAsura\Connector\Api();
 
 		if ( $this->is_request( 'admin' ) ) {
 			$this->container['admin'] = new TheLostAsura\Connector\Admin();
@@ -181,9 +184,6 @@ final class Asura_Connector {
 		if ( $this->is_request( 'ajax' ) ) {
 			$this->container['ajax'] =  new TheLostAsura\Connector\Ajax();
 		}
-
-//		$this->container['api'] = new TheLostAsura\Connector\Api();
-		$this->container['assets'] = new TheLostAsura\Connector\Assets();
 	}
 
 	/**
@@ -209,6 +209,9 @@ final class Asura_Connector {
 
 			case 'frontend':
 				return ( ! is_admin() || defined( 'DOING_AJAX' ) ) && ! defined( 'DOING_CRON' );
+
+			default:
+				break;
 		}
 	}
 

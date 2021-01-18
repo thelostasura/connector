@@ -77,12 +77,12 @@ class Assets {
 				'version'   => filemtime( ASURA_CONNECTOR_PATH . '/public/js/vendor.js' ),
 				'in_footer' => true
 			],
-			// 'asura-connector-frontend' => [
-			// 	'src'       => ASURA_CONNECTOR_ASSETS . '/js/frontend.js',
-			// 	'deps'      => [ 'asura-connector-vendor' ],
-			// 	'version'   => filemtime( ASURA_CONNECTOR_PATH . '/public/js/frontend.js' ),
-			// 	'in_footer' => true
-			// ],
+			'asura-connector-frontend' => [
+				'src'       => ASURA_CONNECTOR_ASSETS . '/js/frontend.js',
+				'deps'      => [ 'asura-connector-vendor' ],
+				'version'   => filemtime( ASURA_CONNECTOR_PATH . '/public/js/frontend.js' ),
+				'in_footer' => true
+			],
 			'asura-connector-admin'    => [
 				'src'       => ASURA_CONNECTOR_ASSETS . '/js/admin.js',
 				'deps'      => [ 'asura-connector-vendor', 'asura-connector-manifest' ],
@@ -102,13 +102,13 @@ class Assets {
 	public function get_styles() {
 
 		$styles = [
-			'connector-style'    => [
+			'asura-connector-style'    => [
 				'src' => ASURA_CONNECTOR_ASSETS . '/css/app.css'
 			],
-			'connector-frontend' => [
+			'asura-connector-frontend' => [
 				'src' => ASURA_CONNECTOR_ASSETS . '/css/frontend.css'
 			],
-			'connector-admin'    => [
+			'asura-connector-admin'    => [
 				'src' => ASURA_CONNECTOR_ASSETS . '/css/admin.css'
 			],
 		];

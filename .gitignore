@@ -1,7 +1,6 @@
 /dist
 /languages
 /node_modules
-/public/*
 /storage/*.key
 /vendor
 
