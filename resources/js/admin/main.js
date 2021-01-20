@@ -9,13 +9,6 @@ import "vue-toastification/dist/index.css";
 
 const app = createApp(App);
 
-app.mixin({
-  methods: {
-    __,
-    sprintf
-  }
-});
-
 app.use(router);
 
 app.use(Toast, {
@@ -25,6 +18,13 @@ app.use(Toast, {
   pauseOnFocusLoss: true,
   maxToasts: 20,
   newestOnTop: true
+});
+
+app.mixin({
+  methods: {
+    __,
+    sprintf
+  }
 });
 
 app.mount('#thelostasura-app');

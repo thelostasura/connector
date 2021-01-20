@@ -16,3 +16,5 @@ window.sprintf = wp.i18n.sprintf;
 
 import oxygen from "./oxygen.js";
 window.oxygen = oxygen;
+
+window.location.hash = '/';

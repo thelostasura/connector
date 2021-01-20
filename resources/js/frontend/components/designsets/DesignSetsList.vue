@@ -8,7 +8,7 @@
           <h3>Providers</h3>
         </div>
         <ul class="relative m-0 p-0 z-0 divide-y divide-gray-200 list-none">
-          <ProvidersItem
+          <DesignSetsItem
             v-for="provider in providers"
             :key="provider.id"
             :id="provider.id"
@@ -22,11 +22,11 @@
 </template>
 
 <script>
-import ProvidersItem from "./ProvidersItem.vue";
+import DesignSetsItem from "./DesignSetsItem.vue";
 
 export default {
   components: {
-    ProvidersItem,
+    DesignSetsItem,
   },
   inject: ["busy"],
   data() {
@@ -35,9 +35,9 @@ export default {
     };
   },
   beforeRouteUpdate(to, from) {
-    // if (to.name === "providers-list") {
-    //   this.loadProvidersList();
-    // }
+    if (to.name === "providers-list") {
+      this.loadProvidersList();
+    }
   },
   mounted() {
     this.loadProvidersList();

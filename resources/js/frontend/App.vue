@@ -1,7 +1,10 @@
 <template>
-  <button @click="isVisible = !isVisible" class="z-50 fixed bottom-0 right-0 p-1 m-2 bg-red-50 border-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer">
+  <button
+    @click="isVisible = !isVisible"
+    class="z-50 fixed bottom-0 right-0 p-1 m-2 bg-red-50 border-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+  >
     <svg
-      :class="{'animate-pulse': isLoading}"
+      :class="{ 'animate-pulse': isLoading }"
       class="w-8 h-8"
       id="Layer_2"
       viewBox="0 0 64 64"
@@ -50,7 +53,14 @@
       />
     </svg>
   </button>
-  <div :class="{hidden: isVisible}" class="z-40 fixed bottom-0 w-screen bg-gray-900" style="height: 80vh;">
+  <div
+    :class="{ hidden: isVisible }"
+    class="z-40 fixed bottom-0 w-screen bg-white"
+    style="height: 70vh"
+  >
+    <div class="flex h-full">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -60,15 +70,23 @@ export default {
     return {
       isVisible: true,
       isLoading: false,
-      loadingCounter: 0
+      loadingCounter: 0,
+    };
+  },
+  provide() {
+    return {
+      busy: this.busy,
     };
   },
   watch: {
-    loadingCounter(count, prevCount){
+    loadingCounter(count, prevCount) {
       this.isLoading = count > 0 ? true : false;
-    }
+    },
   },
-  computed: {
-  }
+  methods: {
+    busy(isBusy = true) {
+      this.loadingCounter += isBusy ? 1 : -1;
+    },
+  },
 };
 </script>

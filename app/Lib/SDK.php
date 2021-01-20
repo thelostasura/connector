@@ -5,9 +5,10 @@ namespace TheLostAsura\Connector\Lib;
 use TheLostAsura\Connector\Utils\Http;
 
 class SDK {
+
     public function remoteRequest( string $method, array $query = [], string $path, $provider ) {
         return Http::timeout( 60 )
-                        ->baseUrl( $provider->provider )
+                        ->baseUrl( "{$provider->provider}/{$provider->endpoint}/{$provider->version}" )
                         ->acceptJson()
                         ->{$method}( $path, array_merge($query, [
                             'api_key'    => $provider->api_key,
@@ -20,7 +21,7 @@ class SDK {
         return $this->remoteRequest('post', [
             'key' => $license_key,
             'domain' => home_url(),
-        ], "/{$provider->endpoint}/{$provider->version}/licenses/domains/register", $provider);
+        ], "/licenses/domains/register", $provider);
     }
 
     public function license_domains_deregister($provider, $license_key) 
@@ -28,6 +29,14 @@ class SDK {
         return $this->remoteRequest('post', [
             'key' => $license_key,
             'domain' => home_url(),
-        ], "/{$provider->endpoint}/{$provider->version}/licenses/domains/deregister", $provider);
+        ], "/licenses/domains/deregister", $provider);
     }
+
+    public function license_terms_index($provider, $hash) 
+    {
+        return $this->remoteRequest('get', [
+            'hash' => $hash,
+        ], "/licenses/terms", $provider);
+    }
+
 }

@@ -10,9 +10,6 @@ class Frontend {
 	public function __construct() {
 		if( Utils::is_oxygen_editor() )
 		{
-			error_log('SHOW_CT_BUILDER');
-			error_log($_SERVER['REQUEST_URI']);
-
 			add_action( 'wp_footer', [$this, 'render_frontend'] );
 			add_action( 'wp_enqueue_scripts', [$this, 'enqueue_scripts']);
 		}

@@ -428,7 +428,7 @@ class Admin {
             License::TABLE_NAME,
             [
                 'id [Int]',
-                'provider_id',
+                'provider_id [Int]',
                 'license',
                 'status [Bool]',
                 'created_at',
