@@ -6,7 +6,7 @@ use TheLostAsura\Connector\Utils\Http;
 
 class SDK {
 
-    public function remoteRequest( string $method, array $query = [], string $path, $provider ) {
+    public function remoteRequest( $method, $query = [], $path, $provider ) {
         return Http::timeout( 60 )
                         ->baseUrl( "{$provider->provider}/{$provider->endpoint}/{$provider->version}" )
                         ->acceptJson()
@@ -16,7 +16,7 @@ class SDK {
                         ]) );
     }
 
-    public function license_domains_register($provider, string $license_key) 
+    public function license_domains_register($provider, $license_key) 
     {
         return $this->remoteRequest('post', [
             'key' => $license_key,
@@ -24,7 +24,7 @@ class SDK {
         ], "/licenses/domains/register", $provider);
     }
 
-    public function license_domains_deregister($provider, string $license_key) 
+    public function license_domains_deregister($provider, $license_key) 
     {
         return $this->remoteRequest('post', [
             'key' => $license_key,
@@ -32,14 +32,14 @@ class SDK {
         ], "/licenses/domains/deregister", $provider);
     }
 
-    public function license_terms_index($provider, string $hash) 
+    public function license_terms_index($provider, $hash) 
     {
         return $this->remoteRequest('get', [
             'hash' => $hash,
         ], "/licenses/terms", $provider);
     }
 
-    public function oxygenbuilder_items($provider, string $hash, string $term_slug) 
+    public function oxygenbuilder_items($provider, $hash, $term_slug) 
     {
         return $this->remoteRequest('get', [
             'hash' => $hash,
@@ -47,7 +47,7 @@ class SDK {
         ], "/oxygenbuilder/items", $provider);
     }
 
-    public function oxygenbuilder_pageclasses($provider, string $hash, string $term_slug, int $post_id) 
+    public function oxygenbuilder_pageclasses($provider, $hash, $term_slug, $post_id) 
     {
         return $this->remoteRequest('get', [
             'hash' => $hash,
@@ -56,7 +56,7 @@ class SDK {
         ], "/oxygenbuilder/pageclasses", $provider);
     }
 
-    public function oxygenbuilder_componentclasses($provider, string $hash, string $term_slug, int $post_id, int $component_id) 
+    public function oxygenbuilder_componentclasses($provider, $hash, $term_slug, $post_id, $component_id) 
     {
         return $this->remoteRequest('get', [
             'hash' => $hash,
