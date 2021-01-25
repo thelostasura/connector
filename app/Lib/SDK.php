@@ -16,7 +16,7 @@ class SDK {
                         ]) );
     }
 
-    public function license_domains_register($provider, $license_key) 
+    public function license_domains_register($provider, string $license_key) 
     {
         return $this->remoteRequest('post', [
             'key' => $license_key,
@@ -24,7 +24,7 @@ class SDK {
         ], "/licenses/domains/register", $provider);
     }
 
-    public function license_domains_deregister($provider, $license_key) 
+    public function license_domains_deregister($provider, string $license_key) 
     {
         return $this->remoteRequest('post', [
             'key' => $license_key,
@@ -32,11 +32,38 @@ class SDK {
         ], "/licenses/domains/deregister", $provider);
     }
 
-    public function license_terms_index($provider, $hash) 
+    public function license_terms_index($provider, string $hash) 
     {
         return $this->remoteRequest('get', [
             'hash' => $hash,
         ], "/licenses/terms", $provider);
+    }
+
+    public function oxygenbuilder_items($provider, string $hash, string $term_slug) 
+    {
+        return $this->remoteRequest('get', [
+            'hash' => $hash,
+            'term_slug' => $term_slug,
+        ], "/oxygenbuilder/items", $provider);
+    }
+
+    public function oxygenbuilder_pageclasses($provider, string $hash, string $term_slug, int $post_id) 
+    {
+        return $this->remoteRequest('get', [
+            'hash' => $hash,
+            'term_slug' => $term_slug,
+            'post_id' => $post_id,
+        ], "/oxygenbuilder/pageclasses", $provider);
+    }
+
+    public function oxygenbuilder_componentclasses($provider, string $hash, string $term_slug, int $post_id, int $component_id) 
+    {
+        return $this->remoteRequest('get', [
+            'hash' => $hash,
+            'term_slug' => $term_slug,
+            'post_id' => $post_id,
+            'component_id' => $component_id,
+        ], "/oxygenbuilder/componentclasses", $provider);
     }
 
 }
