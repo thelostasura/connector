@@ -21,11 +21,8 @@ export default {
     name: String,
     slug: String,
   },
-  inject: ["selectedType"],
   computed: {
     isSelected() {
-      console.log(this.$parent.selectedCategory);
-      console.log(this.slug);
       return this.$parent.selectedCategory == this.slug ? true : false;
     }
   },

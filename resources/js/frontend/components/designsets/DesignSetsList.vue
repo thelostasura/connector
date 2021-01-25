@@ -1,6 +1,5 @@
 <template>
-  <div class="w-1/5 h-full">
-    <!-- This example requires Tailwind CSS v2.0+ -->
+  <div class="w-1/6 h-full">
     <nav class="relative h-full overflow-y-auto" aria-label="Directory">
       <div class="mb-2">
         <span
@@ -44,7 +43,6 @@
               ></path></svg></a
         ></span>
       </div>
-
       <template v-if="selectedType !== null">
         <div class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white">
           <h3>{{ __("Categories", "asura-connector") }}</h3>
@@ -64,10 +62,57 @@
           />
         </ul>
       </template>
-
     </nav>
   </div>
-  <router-view></router-view>
+  
+  <!-- designset item -->
+  <div class="w-1/6 h-full">
+    <nav class="relative h-full overflow-y-auto" aria-label="Directory">
+      <template v-if="selectedType !== null && items.length > 0">
+        <div class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white">
+          <h3>{{ __(selectedType, "asura-connector") }}</h3>
+        </div>
+        <!-- pages -->
+        <ul
+          v-if="selectedType == 'pages'"
+          class="relative m-0 p-0 z-0 divide-y divide-gray-200 list-none"
+        >
+          <DesignSetsItem
+            v-for="(item, index) in items"
+            :key="index"
+            :name="item.name"
+            @show-preview="updatePreviewImage(item)"
+            @hide-preview="updatePreviewImage(null)"
+            @commit="addPageToAngular(item)"
+          />
+        </ul>
+        <!-- components -->
+        <ul
+          v-else-if="selectedType == 'components'"
+          class="relative m-0 p-0 z-0 divide-y divide-gray-200 list-none"
+        >
+          <DesignSetsItem
+            v-for="(item, index) in items"
+            :key="index"
+            :name="item.name"
+            @show-preview="updatePreviewImage(item)"
+            @hide-preview="updatePreviewImage(null)"
+            @update-item="addComponentToAngular(item)"
+          />
+        </ul>
+      </template>
+    </nav>
+  </div>
+
+  <!-- preview image -->
+  <div
+    v-if="image_preview" 
+    class="w-2/6 h-full"
+  >
+    <img class="w-full px-3" :src="image_preview">
+  </div>
+
+
 </template>
 
 <script>
@@ -82,11 +127,6 @@ export default {
     CategoriesList,
   },
   inject: ["busy"],
-  provide() {
-    return {
-      selectedType: this.selectedType,
-    }
-  },
   setup() {
     const toast = useToast();
     return { toast };
@@ -95,7 +135,10 @@ export default {
     return {
       designsets: [],
       selectedType: null,
-      selectedCategory: null
+      selectedCategory: null,
+      items: [],
+      image_preview: null,
+      route_params: null,
     };
   },
   computed: {
@@ -115,12 +158,23 @@ export default {
       return [];
     }
   },
+  watch: {
+    selectedType(_, _2) {
+      this.selectedCategory = null;
+      this.updatedSelectedCategory(null);
+    },
+    selectedCategory(val, oldVal) {
+      this.updatedSelectedCategory(val);
+    }
+  },
   beforeRouteUpdate(to, from) {
     if (to.name === "terms" || to.name === "designsets") {
+    this.route_params = to.params;
       this.loadDesignsList(to.params);
     }
   },
   mounted() {
+    this.route_params = this.$route.params;
     this.loadDesignsList(this.$route.params);
   },
   methods: {
@@ -152,6 +206,49 @@ export default {
     },
     updateCategory(key) {
       this.selectedCategory = key;
+    },
+    updatedSelectedCategory(val) {
+      if (val) {
+				this.items = this.designsets[this.selectedType].filter(obj => {
+					return obj.category === val
+				});
+			} else {
+				this.items = this.designsets[this.selectedType];
+			}
+    },
+    updatePreviewImage(item) {
+      this.image_preview = item?.screenshot_url;
+    },
+    addPageToAngular(item) {
+      this.busy();
+      axios
+        .get(thelostasura.ajax_url, {
+          params: {
+            action: "asura_connector_add_page",
+            provider_id: this.route_params.providerId,
+            license_id: this.route_params.licenseId,
+            term_slug: this.route_params.termSlug,
+            post_id: item.id,
+            _wpnonce: thelostasura.nonce,
+          },
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            oxygen.addPage(response.data.data, `${this.route_params.termSlug}${this.route_params.providerId}${this.route_params.licenseId}`);
+          }
+        })
+        .catch((error) => {
+          console.log(error); // give hint to my lovely Connector user
+          const toastId = this.toast.error(
+            __("Failed to add Page to Editor", "asura-connector")
+          );
+        })
+        .then(() => {
+          this.busy(false);
+        });
+    },
+    addComponentToAngular(item) {
+      
     }
   },
 };

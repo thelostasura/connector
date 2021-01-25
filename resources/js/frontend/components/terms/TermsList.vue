@@ -1,5 +1,5 @@
 <template>
-    <div class="w-1/5 h-full">
+    <div class="w-1/6 h-full">
       <!-- This example requires Tailwind CSS v2.0+ -->
       <nav class="relative h-full overflow-y-auto" aria-label="Directory">
         <div
