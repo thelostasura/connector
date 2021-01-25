@@ -1,7 +1,8 @@
 <template>
   <button
     @click="isVisible = !isVisible"
-    class="z-50 fixed bottom-0 right-0 p-1 m-2 bg-red-50 border-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+    class="z-50 fixed bottom-0 right-0 p-1 m-2 bg-red-50 border-none rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+    :title="__('Asura Connector', 'asura-connector')"
   >
     <svg
       :class="{ 'animate-pulse': isLoading }"
@@ -55,10 +56,10 @@
   </button>
   <div
     :class="{ hidden: isVisible }"
-    class="z-40 fixed bottom-0 w-screen bg-white"
+    class="z-40 fixed bottom-0 w-full bg-gray-600"
     style="height: 70vh"
   >
-    <div class="flex h-full">
+    <div class="flex h-full m-2 p-4 bg-gray-800 rounded-lg shadow-lg">
       <router-view></router-view>
     </div>
   </div>
@@ -80,7 +81,7 @@ export default {
   },
   watch: {
     loadingCounter(count, prevCount) {
-      this.isLoading = count > 0 ? true : false;
+      this.isLoading = count !== 0 ? true : false;
     },
   },
   methods: {

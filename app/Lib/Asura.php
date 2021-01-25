@@ -4,9 +4,9 @@ namespace TheLostAsura\Connector\Lib;
 
 class Asura
 {
-    private static $instances = [];
+    private static array $instances = [];
 
-    private static $sdk;
+    private static SDK $sdk;
 
     protected function __construct() 
     {

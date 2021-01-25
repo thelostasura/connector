@@ -8,6 +8,7 @@
     ],
     "type": "project",
     "require": {
+        "php": "^7.4|^8.0",
         "catfan/medoo": "^1.7",
         "guzzlehttp/guzzle": "^7.2",
         "illuminate/cache": "^8.21",

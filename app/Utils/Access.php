@@ -4,6 +4,10 @@ namespace TheLostAsura\Connector\Utils;
 
 class Access {
 
+    /**
+     * @see \oxygen_vsb_current_user_can_access
+     * @see \oxygen_vsb_current_user_can_full_access
+     */
     public static function can( bool $full = false )
     {
         if ( is_multisite() && is_super_admin() ) {
@@ -57,6 +61,9 @@ class Access {
         return false;
     }
 
+    /**
+     * @see \oxygen_vsb_get_user_edit_mode
+     */
     public static function get_user_edit_mode( bool $skip_role = false )
     {
 
@@ -102,6 +109,9 @@ class Access {
         return "";
     }
 
+    /**
+     * @see \oxygen_is_user_access_option_set
+     */
     public static function is_user_access_option_set( string $option_name )
     {
         $user_id = get_current_user_id();
@@ -117,6 +127,9 @@ class Access {
         }
     }
     
+    /**
+     * @see \oxygen_is_role_access_option_set
+     */
     public static function is_role_access_option_set( string $option_name )
     {
         $user = wp_get_current_user();

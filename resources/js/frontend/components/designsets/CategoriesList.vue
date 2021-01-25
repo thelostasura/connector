@@ -1,6 +1,6 @@
 <template>
   <li
-      @click="$emit('goto')"
+      @click="$emit('update-category')"
       :class="isSelected ? 'bg-gray-600' : 'bg-gray-700'"
       class="relative m-1 px-6 py-2 flex items-center space-x-3 hover:bg-gray-600 rounded-sm focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 no-underline cursor-pointer"
     >
@@ -8,8 +8,8 @@
         <a class="focus:outline-none no-underline">
           <!-- Extend touch target to entire panel -->
           <span class="absolute inset-0" aria-hidden="true"></span>
-          <p class="text-sm font-medium text-white">{{ provider.site_title }}</p>
-          <p class="text-sm text-gray-200 truncate">{{ provider.provider }}</p>
+          <p class="text-sm font-medium text-white">{{ name ? name : slug }}</p>
+          <!-- <p class="text-sm text-gray-200 truncate">{{ slug }}</p> -->
         </a>
       </div>
   </li>
@@ -18,13 +18,17 @@
 <script>
 export default {
   props: {
-    provider: Object,
+    name: String,
+    slug: String,
   },
-  emits: ['goto'],
+  inject: ["selectedType"],
   computed: {
     isSelected() {
-      return this.$route.params?.providerId == this.provider.id ? true : false;
+      console.log(this.$parent.selectedCategory);
+      console.log(this.slug);
+      return this.$parent.selectedCategory == this.slug ? true : false;
     }
-  }
+  },
+  emits: ['update-category'],
 };
 </script>

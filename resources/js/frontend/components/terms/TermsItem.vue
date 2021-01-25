@@ -8,8 +8,8 @@
         <a class="focus:outline-none no-underline">
           <!-- Extend touch target to entire panel -->
           <span class="absolute inset-0" aria-hidden="true"></span>
-          <p class="text-sm font-medium text-white">{{ provider.site_title }}</p>
-          <p class="text-sm text-gray-200 truncate">{{ provider.provider }}</p>
+          <p class="text-sm font-medium text-white">{{ name }}</p>
+          <p class="text-sm text-gray-200 truncate">{{ slug }}</p>
         </a>
       </div>
   </li>
@@ -18,12 +18,15 @@
 <script>
 export default {
   props: {
-    provider: Object,
+    name: String,
+    slug: String,
+    licenseId: Number,
+    providerId: Number,
   },
   emits: ['goto'],
   computed: {
     isSelected() {
-      return this.$route.params?.providerId == this.provider.id ? true : false;
+      return this.$route.params?.licenseId == this.licenseId && this.$route.params?.termSlug == this.slug ? true : false;
     }
   }
 };

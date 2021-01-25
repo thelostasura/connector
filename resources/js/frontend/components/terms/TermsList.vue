@@ -5,14 +5,17 @@
         <div
           class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white"
         >
-          <h3>{{ __('Providers', 'asura-connector') }}</h3>
+          <h3>{{ __('Design Sets', 'asura-connector') }}</h3>
         </div>
         <ul class="relative m-0 p-0 z-0 divide-y divide-gray-200 list-none">
-          <ProvidersItem
-            v-for="provider in providers"
-            :key="provider.id"
-            :provider="provider"
-            @goto="goto(provider)"
+          <TermsItem
+            v-for="term in terms"
+            :key="term.slug"
+            :slug="term.slug"
+            :name="term.name"
+            :license-id="term.license_id"
+            :provider-id="term.provider_id"
+            @goto="goto(term)"
           />
         </ul>
       </nav>
@@ -21,13 +24,13 @@
 </template>
 
 <script>
-import ProvidersItem from "./ProvidersItem.vue";
+import TermsItem from "./TermsItem.vue";
 import { useToast } from "vue-toastification";
 import LoadingSvg from "../../UI/LoadingSvg.vue";
 
 export default {
   components: {
-    ProvidersItem,
+    TermsItem,
   },
   inject: ["busy"],
   setup() {
@@ -36,38 +39,46 @@ export default {
   },
   data() {
     return {
-      providers: []
+      terms: []
     };
   },
+  beforeRouteUpdate(to, from) {
+    if (to.name === "terms") {
+      this.loadTermsList(to.params);
+    }
+  },
   mounted() {
-    this.loadProvidersList();
+    this.loadTermsList(this.$route.params);
   },
   methods: {
-    goto(provider) {
+    goto(term) {
       this.$router.push({
-        name: 'terms',
+        name: 'designsets',
         params: {
-          providerId: provider.id
+          // providerId: term.provider_id,
+          licenseId: term.license_id,
+          termSlug: term.slug,
         }
       });
     },
-    loadProvidersList() {
+    loadTermsList(params) {
       this.busy();
       axios
         .get(thelostasura.ajax_url, {
           params: {
-            action: "asura_connector_list_providers",
+            action: "asura_connector_list_terms",
+            provider_id: params.providerId,
             _wpnonce: thelostasura.nonce,
           },
         })
         .then((response) => {
           if (response.status === 200) {
-            this.providers = response.data.data;
+            this.terms = response.data.data;
           }
         })
         .catch((error) => {
           const toastId = this.toast.error(
-            __("Failed to load Providers list", "asura-connector")
+            __("Failed to load Term list", "asura-connector")
           );
         })
         .then(() => {

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import ProvidersList from "./components/providers/ProvidersList.vue";
+import TermsList from "./components/terms/TermsList.vue";
 import DesignSetsList from "./components/designsets/DesignSetsList.vue";
 
 const router = createRouter({
@@ -14,33 +15,33 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: { name: 'providers-list' }
+      redirect: { name: 'providers' }
     },
     {
       path: '/provider',
-      name: 'providers-list',
+      name: 'providers',
       components: {
         default: ProvidersList,
       },
       children: [
         {
           path: ':providerId',
-          name: 'provider',
-          props: true,
+          name: 'terms',
+          // props: true,
           components: {
-            default: DesignSetsList
+            default: TermsList
           },
-          // children: [
-          //   {
-          //     path: ':designSetSlug/',
-          //     name: 'designset-slug',
-          //     props: true,
-          //     components: {
-          //       default: DesignSetsList
-          //     },
-          //     children: []
-          //   }
-          // ]
+          children: [
+            {
+              path: ':licenseId/:termSlug',
+              name: 'designsets',
+              // props: true,
+              components: {
+                default: DesignSetsList
+              },
+              children: []
+            }
+          ]
         }
       ]
     },

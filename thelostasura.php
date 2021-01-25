@@ -11,7 +11,7 @@
  * Author URI:          https://thelostasura.com
  * Requires at least:   5.5
  * Tested up to:        5.6
- * Requires PHP:        7.0
+ * Requires PHP:        7.4
  * Text Domain:         asura-connector
  * Domain Path:         /languages
  *
@@ -171,7 +171,7 @@ final class Asura_Connector {
 	public function init_classes() {
 
 		$this->container['assets'] = new TheLostAsura\Connector\Assets();
-//		$this->container['api'] = new TheLostAsura\Connector\Api();
+		// $this->container['api'] = new TheLostAsura\Connector\Api();
 
 		if ( $this->is_request( 'admin' ) ) {
 			$this->container['admin'] = new TheLostAsura\Connector\Admin();
