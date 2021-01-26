@@ -2,7 +2,6 @@
 
 namespace TheLostAsura\Connector\Models;
 
-class License
-{
-    const TABLE_NAME = 'tla_licenses';
+class License {
+	const TABLE_NAME = 'tla_licenses';
 }

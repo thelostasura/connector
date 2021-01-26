@@ -2,54 +2,52 @@
 
 namespace TheLostAsura\Connector\Utils;
 
+use Exception;
 use Medoo\Medoo;
 
-class DB
-{
-    private static $instances = [];
+class DB {
+	private static $instances = [];
 
-    private static $medoo;
+	private static $medoo;
 
-    private static $wpdb;
+	private static $wpdb;
 
-    protected function __construct() 
-    {
-        self::$wpdb = self::wpdb();
+	protected function __construct() {
+		self::$wpdb = self::wpdb();
 
-        self::$medoo = new Medoo([
-            'database_type' => 'mysql',
-            'database_name' => self::$wpdb->dbname,
-            'server' => self::$wpdb->dbhost,
-            'username' => self::$wpdb->dbuser,
-            'password' => self::$wpdb->dbpassword,
-            'prefix' => self::$wpdb->prefix,
-        ]);
-    }
+		self::$medoo = new Medoo( [
+			'database_type' => 'mysql',
+			'database_name' => self::$wpdb->dbname,
+			'server'        => self::$wpdb->dbhost,
+			'username'      => self::$wpdb->dbuser,
+			'password'      => self::$wpdb->dbpassword,
+			'prefix'        => self::$wpdb->prefix,
+		] );
+	}
 
-    public static function wpdb() {
-        global $wpdb;
-        return $wpdb;
-    }
-    
-    protected function __clone() { }
+	public static function wpdb() {
+		global $wpdb;
 
-    public function __wakeup()
-    {
-        throw new \Exception("Cannot unserialize a singleton.");
-    }
+		return $wpdb;
+	}
 
-    public static function getInstance() : DB
-    {
-        $cls = static::class;
-        if (!isset(self::$instances[$cls])) {
-            self::$instances[$cls] = new static();
-        }
+	public static function __callStatic( $method, $args ) {
+		return self::getInstance()::$medoo->{$method}( ...$args );
+	}
 
-        return self::$instances[$cls];
-    }
+	public static function getInstance(): DB {
+		$cls = static::class;
+		if ( ! isset( self::$instances[ $cls ] ) ) {
+			self::$instances[ $cls ] = new static();
+		}
 
-    public static function __callStatic($method, $args)
-    {
-        return self::getInstance()::$medoo->{$method}(...$args);
-    }
+		return self::$instances[ $cls ];
+	}
+
+	public function __wakeup() {
+		throw new Exception( "Cannot unserialize a singleton." );
+	}
+
+	protected function __clone() {
+	}
 }

@@ -39,6 +39,15 @@ class Example extends WP_REST_Controller {
 	}
 
 	/**
+	 * Retrieves the query params for the items collection.
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		return [];
+	}
+
+	/**
 	 * Retrieves a collection of items.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -64,14 +73,5 @@ class Example extends WP_REST_Controller {
 	 */
 	public function get_items_permissions_check( $request ) {
 		return true;
-	}
-
-	/**
-	 * Retrieves the query params for the items collection.
-	 *
-	 * @return array Collection parameters.
-	 */
-	public function get_collection_params() {
-		return [];
 	}
 }

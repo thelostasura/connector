@@ -2,36 +2,34 @@
 
 namespace TheLostAsura\Connector\Lib;
 
-class Asura
-{
-    private static array $instances = [];
+use Exception;
 
-    private static SDK $sdk;
+class Asura {
+	private static array $instances = [];
 
-    protected function __construct() 
-    {
-        self::$sdk = new SDK();
-    }
-    
-    protected function __clone() { }
+	private static SDK $sdk;
 
-    public function __wakeup()
-    {
-        throw new \Exception("Cannot unserialize a singleton.");
-    }
+	protected function __construct() {
+		self::$sdk = new SDK();
+	}
 
-    public static function getInstance() : Asura
-    {
-        $cls = static::class;
-        if (!isset(self::$instances[$cls])) {
-            self::$instances[$cls] = new static();
-        }
+	public static function __callStatic( $method, $args ) {
+		return self::getInstance()::$sdk->{$method}( ...$args );
+	}
 
-        return self::$instances[$cls];
-    }
+	public static function getInstance(): Asura {
+		$cls = static::class;
+		if ( ! isset( self::$instances[ $cls ] ) ) {
+			self::$instances[ $cls ] = new static();
+		}
 
-    public static function __callStatic($method, $args)
-    {
-        return self::getInstance()::$sdk->{$method}(...$args);
-    }
+		return self::$instances[ $cls ];
+	}
+
+	public function __wakeup() {
+		throw new Exception( "Cannot unserialize a singleton." );
+	}
+
+	protected function __clone() {
+	}
 }

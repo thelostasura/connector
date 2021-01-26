@@ -2,64 +2,61 @@
 
 namespace TheLostAsura\Connector\Utils;
 
+use Exception;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 
-class Cache
-{
-    private static $instances = [];
+class Cache {
+	private static $instances = [];
 
-    private static $cache;
-    
-    protected function __construct() 
-    {
-        // Create a new Container object, needed by the cache manager.
-        $container = new Container;
+	private static $cache;
 
-        // The CacheManager creates the cache "repository" based on config values
-        // which are loaded from the config class in the container.
-        // More about the config class can be found in the config component; for now we will use an array
-        $container['config'] = [
-            'cache.default' => 'file',
-            'cache.stores.file' => [
-                'driver' => 'file',
-                'path' => ASURA_CONNECTOR_PATH . '/storage/framework/cache/data'
-            ]
-        ];
+	protected function __construct() {
+		// Create a new Container object, needed by the cache manager.
+		$container = new Container;
 
-        // To use the file cache driver we need an instance of Illuminate's Filesystem, also stored in the container
-        $container['files'] = new Filesystem;
+		// The CacheManager creates the cache "repository" based on config values
+		// which are loaded from the config class in the container.
+		// More about the config class can be found in the config component; for now we will use an array
+		$container['config'] = [
+			'cache.default'     => 'file',
+			'cache.stores.file' => [
+				'driver' => 'file',
+				'path'   => ASURA_CONNECTOR_PATH . '/storage/framework/cache/data'
+			]
+		];
 
-        // Create the CacheManager
-        $cacheManager = new CacheManager($container);
+		// To use the file cache driver we need an instance of Illuminate's Filesystem, also stored in the container
+		$container['files'] = new Filesystem;
 
-        // Get the default cache driver (file in this case)
-        self::$cache = $cacheManager->store();
+		// Create the CacheManager
+		$cacheManager = new CacheManager( $container );
 
-        // Or, if you have multiple drivers:
-        // self::$cache = $cacheManager->store('file');
-    }
-    
-    protected function __clone() { }
+		// Get the default cache driver (file in this case)
+		self::$cache = $cacheManager->store();
 
-    public function __wakeup()
-    {
-        throw new \Exception("Cannot unserialize a singleton.");
-    }
+		// Or, if you have multiple drivers:
+		// self::$cache = $cacheManager->store('file');
+	}
 
-    public static function getInstance() : Cache
-    {
-        $cls = static::class;
-        if (!isset(self::$instances[$cls])) {
-            self::$instances[$cls] = new static();
-        }
+	public static function __callStatic( $method, $args ) {
+		return self::getInstance()::$cache->{$method}( ...$args );
+	}
 
-        return self::$instances[$cls];
-    }
+	public static function getInstance(): Cache {
+		$cls = static::class;
+		if ( ! isset( self::$instances[ $cls ] ) ) {
+			self::$instances[ $cls ] = new static();
+		}
 
-    public static function __callStatic($method, $args)
-    {
-        return self::getInstance()::$cache->{$method}(...$args);
-    }
+		return self::$instances[ $cls ];
+	}
+
+	public function __wakeup() {
+		throw new Exception( "Cannot unserialize a singleton." );
+	}
+
+	protected function __clone() {
+	}
 }

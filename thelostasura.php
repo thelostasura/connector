@@ -43,7 +43,7 @@ final class Asura_Connector {
 	 */
 	public $version = '3.0.0';
 	public $db_version = '001';
-	
+
 
 	/**
 	 * Holds various class instances
@@ -77,28 +77,11 @@ final class Asura_Connector {
 		define( 'ASURA_CONNECTOR_VERSION', $this->version );
 		define( 'ASURA_CONNECTOR_DB_VERSION', $this->db_version );
 		define( 'ASURA_CONNECTOR_FILE', __FILE__ );
-		define( 'ASURA_CONNECTOR_PATH', dirname( ASURA_CONNECTOR_FILE ) ); 
-		define( 'ASURA_CONNECTOR_MIGRATION_PATH', ASURA_CONNECTOR_PATH . '/database/migrations/' ); 
+		define( 'ASURA_CONNECTOR_PATH', dirname( ASURA_CONNECTOR_FILE ) );
+		define( 'ASURA_CONNECTOR_MIGRATION_PATH', ASURA_CONNECTOR_PATH . '/database/migrations/' );
 		define( 'ASURA_CONNECTOR_URL', plugins_url( '', ASURA_CONNECTOR_FILE ) );
 		define( 'ASURA_CONNECTOR_ASSETS', ASURA_CONNECTOR_URL . '/public' );
 	}
-
-	public function activate() {
-		if ( ! get_option( 'asura_connector_installed' ) ) {
-			update_option( 'asura_connector_installed', time() );
-		}
-
-		$installed_db_version = get_option('asura_connector_db_version'); 
-
-		if ( ! $installed_db_version || intval($installed_db_version) !== intval(ASURA_CONNECTOR_DB_VERSION) ) {
-			Migration::migrate( $installed_db_version ?: 0, ASURA_CONNECTOR_DB_VERSION );
-			update_option( 'asura_connector_db_version', ASURA_CONNECTOR_DB_VERSION );
-		}
-
-		update_option( 'asura_connector_version', ASURA_CONNECTOR_VERSION );
-	}
-
-	public function deactivate() {}
 
 	/**
 	 * Initializes the Asura_Connector() class
@@ -114,6 +97,24 @@ final class Asura_Connector {
 		}
 
 		return $instance;
+	}
+
+	public function activate() {
+		if ( ! get_option( 'asura_connector_installed' ) ) {
+			update_option( 'asura_connector_installed', time() );
+		}
+
+		$installed_db_version = get_option( 'asura_connector_db_version' );
+
+		if ( ! $installed_db_version || intval( $installed_db_version ) !== intval( ASURA_CONNECTOR_DB_VERSION ) ) {
+			Migration::migrate( $installed_db_version ?: 0, ASURA_CONNECTOR_DB_VERSION );
+			update_option( 'asura_connector_db_version', ASURA_CONNECTOR_DB_VERSION );
+		}
+
+		update_option( 'asura_connector_version', ASURA_CONNECTOR_VERSION );
+	}
+
+	public function deactivate() {
 	}
 
 	/**
@@ -182,7 +183,7 @@ final class Asura_Connector {
 		}
 
 		if ( $this->is_request( 'ajax' ) ) {
-			$this->container['ajax'] =  new TheLostAsura\Connector\Ajax();
+			$this->container['ajax'] = new TheLostAsura\Connector\Ajax();
 		}
 	}
 
@@ -193,7 +194,7 @@ final class Asura_Connector {
 	 *
 	 * @return bool
 	 */
-	private function is_request( string $type ) : bool {
+	private function is_request( string $type ): bool {
 		switch ( $type ) {
 			case 'admin':
 				return is_admin();

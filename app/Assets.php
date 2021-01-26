@@ -44,30 +44,15 @@ class Assets {
 	}
 
 	/**
-	 * Register styles
-	 *
-	 * @param array $styles
-	 *
-	 * @return void
-	 */
-	public function register_styles( $styles ) {
-		foreach ( $styles as $handle => $style ) {
-			$deps = isset( $style['deps'] ) ? $style['deps'] : false;
-
-			wp_register_style( $handle, $style['src'], $deps, ASURA_CONNECTOR_VERSION );
-		}
-	}
-
-	/**
 	 * Get all registered scripts
 	 *
 	 * @return array
 	 */
 	public function get_scripts() {
 		$scripts = [
-			'asura-connector-manifest'  => [
+			'asura-connector-manifest' => [
 				'src'       => ASURA_CONNECTOR_ASSETS . '/js/manifest.js',
-				'deps'		=> [ 'wp-i18n' ],
+				'deps'      => [ 'wp-i18n' ],
 				'version'   => filemtime( ASURA_CONNECTOR_PATH . '/public/js/manifest.js' ),
 				'in_footer' => true
 			],
@@ -92,6 +77,21 @@ class Assets {
 		];
 
 		return $scripts;
+	}
+
+	/**
+	 * Register styles
+	 *
+	 * @param array $styles
+	 *
+	 * @return void
+	 */
+	public function register_styles( $styles ) {
+		foreach ( $styles as $handle => $style ) {
+			$deps = isset( $style['deps'] ) ? $style['deps'] : false;
+
+			wp_register_style( $handle, $style['src'], $deps, ASURA_CONNECTOR_VERSION );
+		}
 	}
 
 	/**
