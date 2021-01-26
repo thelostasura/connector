@@ -3,9 +3,21 @@
   <div class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
       <h3 class="flex text-lg leading-6 font-medium text-gray-900">
-        <router-link :to="{ name: 'providers' }" class="flex"> {{ __('Providers', 'asura-connector') }} 
-          <svg class="w-5 h-5 mt-1 mx-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        <router-link :to="{ name: 'providers' }" class="flex">
+          {{ __("Providers", "asura-connector") }}
+          <svg
+            class="w-5 h-5 mt-1 mx-2"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </router-link>
         {{ templateHeaderTitle }}
@@ -59,7 +71,7 @@
             <ul
               class="border border-gray-200 rounded-md divide-y divide-gray-200"
             >
-              <licensesItem 
+              <licensesItem
                 v-for="license in licenses"
                 :key="license.id"
                 :id="license.id"
@@ -67,7 +79,9 @@
                 @delete="deleteLicense(license.id)"
               />
 
-              <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+              <li
+                class="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+              >
                 <form @submit.prevent="doSave" class="flex-1 flex w-full">
                   <div class="w-0 flex-1 flex items-center">
                     Add License key:
@@ -336,15 +350,21 @@ export default {
       );
 
       axios
-        .post(thelostasura.ajax_url, new URLSearchParams({
-          action: "asura_connector_add_license",
-          license_key: this.form.license_key,
-          provider_id: this.provider_id,
-          _wpnonce: thelostasura.nonce,
-        }))
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            action: "asura_connector_add_license",
+            license_key: this.form.license_key,
+            provider_id: this.provider_id,
+            _wpnonce: thelostasura.nonce,
+          })
+        )
         .then((response) => {
           this.toast.update(toastId, {
-            content: __( "New license key added successfully.", "asura-connector" ),
+            content: __(
+              "New license key added successfully.",
+              "asura-connector"
+            ),
             options: {
               type: "success",
               icon: true,
@@ -353,12 +373,11 @@ export default {
           });
 
           this.loadLicensesList();
-          this.form.license_key = '';
+          this.form.license_key = "";
         })
         .catch((error) => {
-          
           this.toast.update(toastId, {
-            content: __( "Failed to add new license key.", "asura-connector" ),
+            content: __("Failed to add new license key.", "asura-connector"),
             options: {
               type: "error",
               icon: true,
@@ -372,8 +391,7 @@ export default {
             });
           }
         })
-        .then(() => {
-        });
+        .then(() => {});
     },
   },
 };

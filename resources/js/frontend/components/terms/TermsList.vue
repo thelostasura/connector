@@ -1,26 +1,26 @@
 <template>
-    <div class="w-1/6 h-full">
-      <!-- This example requires Tailwind CSS v2.0+ -->
-      <nav class="relative h-full overflow-y-auto" aria-label="Directory">
-        <div
-          class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white"
-        >
-          <h3>{{ __('Design Sets', 'asura-connector') }}</h3>
-        </div>
-        <ul class="relative m-0 p-0 z-0 divide-y divide-gray-200 list-none">
-          <TermsItem
-            v-for="term in terms"
-            :key="term.slug"
-            :slug="term.slug"
-            :name="term.name"
-            :license-id="term.license_id"
-            :provider-id="term.provider_id"
-            @goto="goto(term)"
-          />
-        </ul>
-      </nav>
-    </div>
-    <router-view></router-view>
+  <div class="w-1/6 h-full">
+    <!-- This example requires Tailwind CSS v2.0+ -->
+    <nav class="relative h-full overflow-y-auto" aria-label="Directory">
+      <div
+        class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white"
+      >
+        <h3>{{ __("Design Sets", "asura-connector") }}</h3>
+      </div>
+      <ul class="relative m-0 p-0 z-0 divide-y divide-gray-200 list-none">
+        <TermsItem
+          v-for="term in terms"
+          :key="term.slug"
+          :slug="term.slug"
+          :name="term.name"
+          :license-id="term.license_id"
+          :provider-id="term.provider_id"
+          @goto="goto(term)"
+        />
+      </ul>
+    </nav>
+  </div>
+  <router-view></router-view>
 </template>
 
 <script>
@@ -39,7 +39,7 @@ export default {
   },
   data() {
     return {
-      terms: []
+      terms: [],
     };
   },
   beforeRouteUpdate(to, from) {
@@ -53,12 +53,12 @@ export default {
   methods: {
     goto(term) {
       this.$router.push({
-        name: 'designsets',
+        name: "designsets",
         params: {
           // providerId: term.provider_id,
           licenseId: term.license_id,
           termSlug: term.slug,
-        }
+        },
       });
     },
     loadTermsList(params) {
@@ -77,6 +77,7 @@ export default {
           }
         })
         .catch((error) => {
+          console.log(error); // give hint to my lovely Connector user
           const toastId = this.toast.error(
             __("Failed to load Term list", "asura-connector")
           );
@@ -85,6 +86,6 @@ export default {
           this.busy(false);
         });
     },
-  }
+  },
 };
 </script>

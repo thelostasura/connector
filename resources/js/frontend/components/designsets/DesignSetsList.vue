@@ -2,8 +2,7 @@
   <div class="w-1/6 h-full">
     <nav class="relative h-full overflow-y-auto" aria-label="Directory">
       <div class="mb-2">
-        <span
-          class="inline-flex rounded-md shadow-sm w-full justify-center"
+        <span class="inline-flex rounded-md shadow-sm w-full justify-center"
           ><a
             v-if="showPagesButton"
             @click="selectedType = 'pages'"
@@ -27,7 +26,9 @@
             v-if="showComponentsButton"
             @click="selectedType = 'components'"
             :title="__('Section & Elements', 'asura-connector')"
-            :class="selectedType == 'components' ? 'bg-gray-600' : 'bg-gray-700'"
+            :class="
+              selectedType == 'components' ? 'bg-gray-600' : 'bg-gray-700'
+            "
             class="cursor-pointer whitespace-no-wrap inline-flex items-center justify-center w-10 h-10 px-2 py-2 m-1 border border-transparent text-base leading-6 font-medium rounded-md text-white hover:bg-gray-600 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150"
             ><svg
               xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +45,9 @@
         ></span>
       </div>
       <template v-if="selectedType !== null">
-        <div class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white">
+        <div
+          class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white"
+        >
           <h3>{{ __("Categories", "asura-connector") }}</h3>
         </div>
         <ul class="relative m-0 p-0 z-0 divide-y divide-gray-200 list-none">
@@ -64,12 +67,14 @@
       </template>
     </nav>
   </div>
-  
+
   <!-- designset item -->
   <div class="w-1/6 h-full">
     <nav class="relative h-full overflow-y-auto" aria-label="Directory">
       <template v-if="selectedType !== null && items.length > 0">
-        <div class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white">
+        <div
+          class="z-10 sticky top-0 bg-gray-800 border-t border-b border-gray-200 px-3 text-sm font-medium text-white"
+        >
           <h3>{{ __(selectedType, "asura-connector") }}</h3>
         </div>
         <!-- pages -->
@@ -97,7 +102,7 @@
             :name="item.name"
             @show-preview="updatePreviewImage(item)"
             @hide-preview="updatePreviewImage(null)"
-            @update-item="addComponentToAngular(item)"
+            @commit="addComponentToAngular(item)"
           />
         </ul>
       </template>
@@ -105,14 +110,9 @@
   </div>
 
   <!-- preview image -->
-  <div
-    v-if="image_preview" 
-    class="w-2/6 h-full"
-  >
-    <img class="w-full px-3" :src="image_preview">
+  <div v-if="image_preview" class="w-2/6 h-full">
+    <img class="w-full px-3" :src="image_preview" />
   </div>
-
-
 </template>
 
 <script>
@@ -149,14 +149,20 @@ export default {
       return this.designsets?.components?.length > 0;
     },
     categories() {
-      if (this.selectedType === 'pages' && this.designsets?.categories?.pages?.length > 0) {
+      if (
+        this.selectedType === "pages" &&
+        this.designsets?.categories?.pages?.length > 0
+      ) {
         return this.designsets.categories.pages;
       }
-      if (this.selectedType === 'components' && this.designsets?.categories?.components?.length > 0) {
+      if (
+        this.selectedType === "components" &&
+        this.designsets?.categories?.components?.length > 0
+      ) {
         return this.designsets.categories.components;
       }
       return [];
-    }
+    },
   },
   watch: {
     selectedType(_, _2) {
@@ -165,11 +171,11 @@ export default {
     },
     selectedCategory(val, oldVal) {
       this.updatedSelectedCategory(val);
-    }
+    },
   },
   beforeRouteUpdate(to, from) {
     if (to.name === "terms" || to.name === "designsets") {
-    this.route_params = to.params;
+      this.route_params = to.params;
       this.loadDesignsList(to.params);
     }
   },
@@ -196,6 +202,7 @@ export default {
           }
         })
         .catch((error) => {
+          console.log(error); // give hint to my lovely Connector user
           const toastId = this.toast.error(
             __("Failed to load Design  list", "asura-connector")
           );
@@ -209,12 +216,12 @@ export default {
     },
     updatedSelectedCategory(val) {
       if (val) {
-				this.items = this.designsets[this.selectedType].filter(obj => {
-					return obj.category === val
-				});
-			} else {
-				this.items = this.designsets[this.selectedType];
-			}
+        this.items = this.designsets[this.selectedType].filter((obj) => {
+          return obj.category === val;
+        });
+      } else {
+        this.items = this.designsets[this.selectedType];
+      }
     },
     updatePreviewImage(item) {
       this.image_preview = item?.screenshot_url;
@@ -234,7 +241,10 @@ export default {
         })
         .then((response) => {
           if (response.status === 200) {
-            oxygen.addPage(response.data.data, `${this.route_params.termSlug}${this.route_params.providerId}${this.route_params.licenseId}`);
+            oxygen.addPage(
+              response.data.data,
+              `${this.route_params.termSlug}${this.route_params.providerId}${this.route_params.licenseId}`
+            );
           }
         })
         .catch((error) => {
@@ -248,8 +258,38 @@ export default {
         });
     },
     addComponentToAngular(item) {
-      
-    }
+      this.busy();
+      axios
+        .get(thelostasura.ajax_url, {
+          params: {
+            action: "asura_connector_add_component",
+            provider_id: this.route_params.providerId,
+            license_id: this.route_params.licenseId,
+            term_slug: this.route_params.termSlug,
+            post_id: item.page,
+            component_id: item.id,
+            _wpnonce: thelostasura.nonce,
+          },
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            oxygen.addComponent(
+              response.data.data,
+              item.id,
+              `${this.route_params.termSlug}${this.route_params.providerId}${this.route_params.licenseId}`
+            );
+          }
+        })
+        .catch((error) => {
+          console.log(error); // give hint to my lovely Connector user
+          const toastId = this.toast.error(
+            __("Failed to add Component to Editor", "asura-connector")
+          );
+        })
+        .then(() => {
+          this.busy(false);
+        });
+    },
   },
 };
 </script>

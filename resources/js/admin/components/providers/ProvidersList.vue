@@ -12,7 +12,9 @@
         >
           <div class="flex-1 min-w-0">
             <h1 class="text-lg font-medium leading-6 text-gray-900 sm:truncate">
-              <router-link :to="{ name: 'providers' }"> {{ __("Provider", "asura-connector") }} </router-link>
+              <router-link :to="{ name: 'providers' }">
+                {{ __("Provider", "asura-connector") }}
+              </router-link>
             </h1>
           </div>
           <div class="mt-4 flex sm:mt-0 sm:ml-4">
@@ -175,12 +177,12 @@ export default {
     },
     editProvider(id) {
       this.$router.push({
-        name: 'provider.edit',
+        name: "provider.edit",
         params: {
-          providerId: id
-        }
+          providerId: id,
+        },
       });
-    }
+    },
   },
 };
 </script>

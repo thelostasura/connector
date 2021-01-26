@@ -18,7 +18,10 @@
       <span class="ml-2 flex-1 w-0 truncate"> {{ licenseKey }} </span>
     </div>
     <div class="ml-4 flex-shrink-0">
-      <button @click="$emit('delete')" class="font-medium text-indigo-600 hover:text-indigo-500">
+      <button
+        @click="$emit('delete')"
+        class="font-medium text-indigo-600 hover:text-indigo-500"
+      >
         Revoke
       </button>
     </div>
@@ -27,10 +30,10 @@
 
 <script>
 export default {
-    emits: ['delete'],
-    props: {
-        id: Number,
-        licenseKey: String,
-    }
-}
+  emits: ["delete"],
+  props: {
+    id: Number,
+    licenseKey: String,
+  },
+};
 </script>

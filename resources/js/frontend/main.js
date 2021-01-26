@@ -28,11 +28,3 @@ app.mixin({
 });
 
 app.mount('#thelostasura-app');
-
-
-
-
-
-
-
-

@@ -97,7 +97,7 @@
               </div>
               <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                 <router-link
-                  :to="{name: 'providers'}"
+                  :to="{ name: 'providers' }"
                   type="button"
                   class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:order-0 sm:ml-0"
                 >
@@ -110,8 +110,7 @@
                   {{ __("Save", "asura-connector") }}
                 </button>
               </div>
-            </form>  
-
+            </form>
           </div>
         </div>
       </div>
@@ -159,14 +158,17 @@ export default {
       );
 
       axios
-        .post(thelostasura.ajax_url, new URLSearchParams({
-          action: "asura_connector_add_provider",
-          connector: this.form.connector,
-          _wpnonce: thelostasura.nonce,
-        }))
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            action: "asura_connector_add_provider",
+            connector: this.form.connector,
+            _wpnonce: thelostasura.nonce,
+          })
+        )
         .then((response) => {
           this.toast.update(toastId, {
-            content: __( "New Provider added successfully.", "asura-connector" ),
+            content: __("New Provider added successfully.", "asura-connector"),
             options: {
               type: "success",
               icon: true,
@@ -174,12 +176,11 @@ export default {
             },
           });
 
-          this.$router.push({name: 'providers'});
+          this.$router.push({ name: "providers" });
         })
         .catch((error) => {
-          
           this.toast.update(toastId, {
-            content: __( "Failed to add new Provider.", "asura-connector" ),
+            content: __("Failed to add new Provider.", "asura-connector"),
             options: {
               type: "error",
               icon: true,
@@ -193,12 +194,10 @@ export default {
             });
           }
         })
-        .then(() => {
-        });
+        .then(() => {});
     },
   },
-  mounted() {
-  },
+  mounted() {},
   created() {},
 };
 </script>

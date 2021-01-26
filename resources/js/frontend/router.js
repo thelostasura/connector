@@ -27,7 +27,6 @@ const router = createRouter({
         {
           path: ':providerId',
           name: 'terms',
-          // props: true,
           components: {
             default: TermsList
           },
@@ -35,7 +34,6 @@ const router = createRouter({
             {
               path: ':licenseId/:termSlug',
               name: 'designsets',
-              // props: true,
               components: {
                 default: DesignSetsList
               },
@@ -45,7 +43,6 @@ const router = createRouter({
         }
       ]
     },
-    
   ]
 });
 

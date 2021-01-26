@@ -269,31 +269,31 @@ export default {
     },
     loadProvider(id) {
       axios
-      .get(thelostasura.ajax_url, {
-        params: {
-          action: "asura_connector_get_provider",
-          _wpnonce: thelostasura.nonce,
-          provider_id: id ? id : this.providerId,
-        },
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          const provider = response.data.data;
+        .get(thelostasura.ajax_url, {
+          params: {
+            action: "asura_connector_get_provider",
+            _wpnonce: thelostasura.nonce,
+            provider_id: id ? id : this.providerId,
+          },
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            const provider = response.data.data;
 
-          this.form.provider = provider.provider;
-          this.form.site_title = provider.site_title;
-          this.form.api_key = provider.api_key;
-          this.form.api_secret = provider.api_secret;
-          this.form.endpoint = provider.endpoint;
-          this.form.version = provider.version;
-        }
-      })
-      .catch((error) => {
-        const toastId = this.toast.error(
-          __("Failed to load the provider", "asura-connector")
-        );
-      });
-    }
+            this.form.provider = provider.provider;
+            this.form.site_title = provider.site_title;
+            this.form.api_key = provider.api_key;
+            this.form.api_secret = provider.api_secret;
+            this.form.endpoint = provider.endpoint;
+            this.form.version = provider.version;
+          }
+        })
+        .catch((error) => {
+          const toastId = this.toast.error(
+            __("Failed to load the provider", "asura-connector")
+          );
+        });
+    },
   },
   beforeRouteUpdate(to, from) {
     this.loadProvider(to.params.providerId);

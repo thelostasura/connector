@@ -265,56 +265,6 @@ class Frontend {
         wp_die();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function add_page() {
         check_ajax_referer( 'asura-connector-admin' );
 
@@ -521,11 +471,214 @@ class Frontend {
         wp_die();
     }
 
+    public function add_component() {
+        check_ajax_referer( 'asura-connector-admin' );
 
+        if ( empty( $_REQUEST[ 'provider_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The provider id is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        } else if ( ! is_numeric( $_REQUEST[ 'provider_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'invalid_field', 
+                    __( 'The provider id should numeric', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
 
+        if ( empty( $_REQUEST[ 'license_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The license id is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        } else if ( ! is_numeric( $_REQUEST[ 'license_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'invalid_field', 
+                    __( 'The license id should numeric', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
 
+        if ( empty( $_REQUEST[ 'term_slug' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The term slug is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        } else if ( ! is_string( $_REQUEST[ 'term_slug' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'invalid_field', 
+                    __( 'The term slug should string', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
 
+        if ( empty( $_REQUEST[ 'post_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The post id is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        } else if ( ! is_numeric( $_REQUEST[ 'post_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'invalid_field', 
+                    __( 'The post id should numeric', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
 
+        if ( empty( $_REQUEST[ 'component_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'missing_field', 
+                    __( 'The component id is required', 'asura-connector' ) 
+                ),
+                400
+            );
+        } else if ( ! is_numeric( $_REQUEST[ 'component_id' ] ) ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'invalid_field', 
+                    __( 'The component id should numeric', 'asura-connector' ) 
+                ),
+                400
+            );
+        }
+        
+        $provider_id = $_REQUEST[ 'provider_id' ];
+
+        $provider = (object) DB::get(Provider::TABLE_NAME, [
+            'id [Int]',
+            'provider',
+            'site_title',
+            'api_key',
+            'api_secret',
+            'endpoint',
+            'version',
+            'status [Bool]',
+        ], [
+            'id' => $provider_id,
+        ]);
+
+        if ( ! $provider ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'record_not_exist', 
+                    __( 'The provider id is not exist', 'asura-connector' ) 
+                ),
+                404
+            );
+        }
+        
+        $license_id = $_REQUEST[ 'license_id' ];
+
+        $license = (object) DB::get(License::TABLE_NAME, [
+            'id [Int]',
+            'provider_id',
+            'hash',
+        ],
+        [
+            'provider_id' => $provider_id,
+            'id' => $license_id,
+        ]);
+
+        if ( ! $license ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'record_not_exist', 
+                    __( 'The license id is not exist', 'asura-connector' ) 
+                ),
+                404
+            );
+        }
+
+        $term_slug = $_REQUEST[ 'term_slug' ];
+        $post_id = $_REQUEST[ 'post_id' ];
+        $component_id = $_REQUEST[ 'component_id' ];
+
+        $componentCache = Cache::remember("component_{$license->provider_id}_{$license->id}_{$term_slug}_{$post_id}_{$component_id}", Carbon::now()->addHour(), function () use ($provider, $license, $term_slug, $post_id, $component_id) {
+            $response = Asura::oxygenbuilder_componentclasses($provider, $license->hash, $term_slug, $post_id, $component_id);
+
+            if( $response->status() !== 200 ) {
+                error_log( "asura-connector [error]: couldn't retrieve design sets component for license id {$license->id} and term slug {$term_slug}. http error code: {$response->status()}" );
+                return null;
+            }
+        
+            $component = [];
+            $classes = [];
+            $colors = [];
+            $lookupTable = [];
+
+            $content = json_decode($response->body(), true)['data'];
+            
+            if(isset($content['component'])) {
+                $component = $content['component'];
+            }
+            if(isset($content['classes'])) {
+                $classes = $content['classes'];
+            }
+            if(isset($content['colors'])) {
+                $colors = $content['colors'];
+            }
+            if(isset($content['lookuptable'])) {
+                $lookupTable = $content['lookuptable'];
+            }
+
+            $component = ct_base64_encode_decode_tree([$component], true)[0];
+    
+            $output = [
+                'component' => $component
+            ];
+    
+            if(sizeof($classes) > 0) {
+                $output['classes'] = $classes;
+            }
+    
+            if(sizeof($colors) > 0) {
+                $output['colors'] = $colors;
+            }
+    
+            if(sizeof($lookupTable) > 0) {
+                $output['lookuptable'] = $lookupTable;
+            }
+    
+            return $output;
+
+        });
+
+        if ( ! $componentCache ) {
+            wp_send_json_error( 
+                new WP_Error( 
+                    'asura_connection_error', 
+                    __( "Couldn't retrieve design sets component, please contact design set provider or plugin developer", 'asura-connector' ) 
+                ),
+                500
+            );
+        }
+
+        wp_send_json_success($componentCache);
+
+        wp_die();
+    }
 
 
 
