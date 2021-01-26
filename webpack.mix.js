@@ -15,5 +15,5 @@ mix
   .options({
     processCssUrls: false,
   })
-  .copy('resources/img', 'public')
+  .copy('resources/img', 'public/img')
   .disableNotifications();
