@@ -58,10 +58,477 @@ class Admin {
 			'clean_cache'  => [
 				'handler' => [ $this, 'clean_cache' ]
 			],
+
+
+
+			'wizard_colors'  => [
+				'handler' => [ $this, 'wizard_colors' ]
+			],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+			// 'wizard_'  => [
+			// 	'handler' => [ $this, 'wizard_' ]
+			// ],
+
+
+
 		];
 
 		return $ajaxs;
+
 	}
+
+
+
+
+
+
+
+
+
+	/**
+	 * @see ct_setup_default_colors
+	 */
+	public function wizard_colors() {
+		check_ajax_referer( 'asura-connector-admin' );
+
+		if ( empty( $_REQUEST['provider_id'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'missing_field',
+					__( 'The provider id is required', 'asura-connector' )
+				),
+				400
+			);
+		} else if ( ! is_numeric( $_REQUEST['provider_id'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'invalid_field',
+					__( 'The provider id should numeric', 'asura-connector' )
+				),
+				400
+			);
+		}
+
+		if ( empty( $_REQUEST['license_id'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'missing_field',
+					__( 'The license id is required', 'asura-connector' )
+				),
+				400
+			);
+		} else if ( ! is_numeric( $_REQUEST['license_id'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'invalid_field',
+					__( 'The license id should numeric', 'asura-connector' )
+				),
+				400
+			);
+		}
+
+		if ( empty( $_REQUEST['term_slug'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'missing_field',
+					__( 'The term slug is required', 'asura-connector' )
+				),
+				400
+			);
+		} else if ( ! is_string( $_REQUEST['term_slug'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'invalid_field',
+					__( 'The term slug should string', 'asura-connector' )
+				),
+				400
+			);
+		}
+
+		$provider_id = $_REQUEST['provider_id'];
+		$license_id = $_REQUEST['license_id'];
+		$term_slug = $_REQUEST['term_slug'];
+		$overwrite = $_REQUEST['overwrite'] === 'true';
+
+		$provider = (object) DB::get( Provider::TABLE_NAME, [
+			'id [Int]',
+			'provider',
+			'site_title',
+			'api_key',
+			'api_secret',
+			'endpoint',
+			'version',
+			'status [Bool]',
+		], [
+			'id' => $provider_id,
+		] );
+
+		if ( ! $provider ) {
+			wp_send_json_error(
+				new WP_Error(
+					'record_not_exist',
+					__( 'The provider id is not exist', 'asura-connector' )
+				),
+				404
+			);
+		}
+
+		$license = (object) DB::get( License::TABLE_NAME, [
+			'id [Int]',
+			'provider_id',
+			'hash',
+		],
+		[
+			'provider_id' => $provider_id,
+			'id'          => $license_id,
+		] );
+
+		if ( ! $license ) {
+			wp_send_json_error(
+				new WP_Error(
+					'record_not_exist',
+					__( 'The license id is not exist', 'asura-connector' )
+				),
+				404
+			);
+		}
+
+		$cache = Cache::remember( "colors_{$license->provider_id}_{$license->id}_{$term_slug}", Carbon::now()->addHour(), function () use ( $provider, $license, $term_slug ) {
+			$response = Asura::oxygenbuilder_colors( $provider, $license->hash, $term_slug );
+
+			if ( $response->status() !== 200 ) {
+				error_log( "asura-connector [error]: couldn't retrieve colors for license id {$license->id} and term slug {$term_slug}. http error code: {$response->status()}" );
+
+				return null;
+			}
+
+			return json_decode( $response->body(), true )['data'];
+		} );
+
+		if ( ! $cache ) {
+			wp_send_json_error(
+				new WP_Error(
+					'asura_connection_error',
+					__( "Couldn't retrieve colors, please contact design set provider or plugin developer", 'asura-connector' )
+				),
+				500
+			);
+		}
+
+		$colors = isset($cache['colors'])? $cache['colors'] : false;
+		$lookupTable = isset($cache['lookuptable'])? $cache['lookuptable'] : false;
+	
+		// if a lookup table is provided (by a classic design set, store it as transient data to be used in other steps)
+		if(is_array($lookupTable)) {
+			// convert keys to lower case
+			$smLookupTable = [];
+	
+			foreach($lookupTable as $key => $item) {
+				$smLookupTable[strToLower($key)] = $item;
+			} 
+			
+			set_transient('oxygen_vsb_source_color_lookup_table', $smLookupTable);
+		}
+		else {
+			delete_transient('oxygen_vsb_source_color_lookup_table');
+		}
+	
+		if(is_array($colors)) {
+	
+			$sourceColorMap = [];
+	
+			// set Name for the incoming colors
+			$setName = sanitize_text_field($term_slug);
+	
+			if($overwrite) { // replace all old data
+	
+				$existing = [
+					'colorsIncrement' => 0,
+					'setsIncrement' => 1,
+					'colors' => [],
+					'sets' => [
+						[
+							'id' => 1,
+							'name' => $setName,
+						]
+					],
+				];
+	
+				foreach($colors as $key => $color) {
+	
+					$sourceColorMap[$color['id']] = ++$existing['colorsIncrement'];
+	
+					$color['id'] = $existing['colorsIncrement'];
+	
+					// assign the new Parent
+					$color['set'] = 1;
+	
+					$existing['colors'][] = $color;
+				}
+	
+				update_option('oxygen_vsb_global_colors', $existing);
+	
+			}
+	
+			else { // add to the existing data
+				
+				// colors are an array of arrays with each having a name and a value
+				// get existing colors
+	
+				$existing = get_option('oxygen_vsb_global_colors', []);
+	
+				$existing['colors'];
+	
+				$existing['sets'];
+	
+				// find a set with that name
+				$existingSetId = false;
+	
+				foreach($existing['sets'] as $key => $set) {
+	
+					if($set['name'] == $setName) {
+						$existingSetId = $set['id'];
+					}
+	
+					//remove hashkey attribute from the existing sets
+					if(isset($existing['sets'][$key]['$$hashKey']))
+						unset($existing['sets'][$key]['$$hashKey']);
+				}
+	
+				// if this set does not already exist, create it
+				if($existingSetId === false) {
+	
+					$existingSetId = ++$existing['setsIncrement'];
+	
+					$existing['sets'][] = array(
+						'id' => $existingSetId, // and increment
+						'name' => $setName
+					);
+	
+				}
+				
+				// remove hash keys from all existing colors
+				foreach($existing['colors'] as $key => $color) {
+					if(isset($existing['colors'][$key]['$$hashKey']))
+						unset($existing['colors'][$key]['$$hashKey']);
+				}
+	
+				// for each of the incoming colors
+				foreach($colors as $key => $color) {
+	
+					// if a color with the same name already exists in the same set, then over write it
+					$existingColorUpdated = false;
+	
+					foreach($existing['colors'] as $eKey => $eColor) {
+	
+						if($eColor['name'] == $color['name'] && $eColor['set'] === $existingSetId) {
+	
+							$existing['colors'][$eKey]['value'] = strtolower($color['value']);
+	
+							$sourceColorMap[$color['id']] = $eColor['id'];
+	
+							$existingColorUpdated = true;
+							break;
+						}
+	
+					}
+	
+					//updating an existing color, so no need to add it as a new one, so skip the rest
+					if($existingColorUpdated) {
+						continue;
+					}
+	
+					$sourceColorMap[$color['id']] = ++$existing['colorsIncrement'];
+	
+					// add a new ID for adjusting it into the existing colors array
+					$color['id'] = $existing['colorsIncrement'];
+	
+					// assign the new Parent
+					$color['set'] = $existingSetId;
+	
+					$color['value'] = strtolower($color['value']);
+	
+					// add the color to the existing colors;
+	
+					$existing['colors'][] = $color;
+	
+				}
+	
+				update_option('oxygen_vsb_global_colors', $existing);
+			}
+	
+			set_transient('oxygen_vsb_source_color_map', $sourceColorMap);
+	
+		}
+
+		wp_send_json_success( null );
+
+		wp_die();
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	public function add_provider() {
 		check_ajax_referer( 'asura-connector-admin' );
