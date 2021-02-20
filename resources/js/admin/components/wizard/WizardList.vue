@@ -21,6 +21,16 @@
           </svg>
         </router-link>
         {{ __("Install Wizard", "asura-connector") }}
+        <!-- Heroicon name: breaker -->
+        <svg 
+          class="mx-3 h-7 w-h-7 text-gray-400 group-hover:text-gray-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
       </h3>
       <p class="mt-1 max-w-2xl text-sm text-gray-500">
         {{
@@ -40,114 +50,38 @@
           </dd>
         </div>
         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">License Keys</dt>
+          <dt class="text-sm font-medium text-gray-500">Overwrite all Oxygen's settings?</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <span class="mr-4" :class="!Boolean(form.overwrite) ? 'p-1 rounded-sm text-gray-800 font-semibold bg-gray-200 dark:bg-gray-300' : ''">
+                {{ __("Keep & disable", "asura-connector") }}
+              </span>
+              
+              <!-- On: "bg-purple-600", Off: "bg-gray-200" -->
+              <button @click="form.overwrite = !Boolean(form.overwrite)" :class="Boolean(form.overwrite) ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-300'" type="button" class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-900 sm:ml-auto">
+                  <span class="sr-only">⚠ Overwrite</span>
+                  <!-- On: "translate-x-5", Off: "translate-x-0" -->
+                  <span :class="Boolean(form.overwrite) ? 'translate-x-5' : 'translate-x-0'" class="inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+              </button>
+                
+              <span class="ml-4" :class="Boolean(form.overwrite) ? 'p-1 rounded-sm text-red-700 font-semibold bg-gray-200 dark:bg-gray-300' : ''">
+                {{ __("⚠ Overwrite", "asura-connector") }}
+              </span>
+          </dd>
+        </div>
+        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500"> {{ __("Design sets", "asura-connector") }} </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
             <ul
               class="border border-gray-200 rounded-md divide-y divide-gray-200"
             >
               <WizardItem
-                v-for="license in licenses"
-                :key="license.id"
-                :id="license.id"
-                :license-key="license.license"
-                @delete="deleteLicense(license.id)"
+                v-for="term in terms"
+                :key="term.slug"
+                :slug="term.slug"
+                :name="term.name"
+                @install="doInstall(term.provider_id, term.license_id, term.slug)"
               />
-
-              <li
-                class="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
-              >
-                <form @submit.prevent="doSave" class="flex-1 flex w-full">
-                  <div class="w-0 flex-1 flex items-center">
-                    Add License key:
-                    <div
-                      class="ml-2 mr-10 flex-1 w-0 relative rounded-md shadow-sm"
-                    >
-                      <div
-                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                      >
-                        <!-- Heroicon name: key -->
-                        <svg
-                          class="mt-1 h-5 w-5 text-gray-400"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          aria-hidden="true"
-                          stroke="currentColor"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                          />
-                        </svg>
-                      </div>
-                      <input
-                        v-model="form.license_key"
-                        type="text"
-                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm sm:leading-5 border-gray-300 rounded-md placeholder-gray-500 placeholder-opacity-50"
-                      />
-                    </div>
-                  </div>
-                  <div class="ml-4 flex-shrink-0">
-                    <button
-                      type="submit"
-                      class="flex px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:order-1 sm:ml-3"
-                    >
-                      <svg
-                        class="h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      {{ __("Add", "asura-connector") }}
-                    </button>
-                  </div>
-                </form>
-              </li>
             </ul>
-            <div
-              v-if="form.errors.length >= 1"
-              class="rounded-md bg-red-50 p-4 mt-2"
-            >
-              <div class="flex">
-                <div class="flex-shrink-0">
-                  <!-- Heroicon name: x-circle -->
-                  <svg
-                    class="h-5 w-5 text-red-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div class="ml-3">
-                  <h3 class="text-sm leading-5 font-medium text-red-800">
-                    {{ errorMessageHeader }}
-                  </h3>
-                  <div class="mt-2 text-sm leading-5 text-red-700">
-                    <ul class="list-disc pl-5">
-                      <li v-for="error in form.errors" :key="error">
-                        {{ error.message }}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
           </dd>
         </div>
       </dl>
@@ -166,6 +100,7 @@ export default {
   },
   setup() {
     const toast = useToast();
+    const toastId = null;
     return { toast };
   },
   props: {
@@ -190,10 +125,9 @@ export default {
   data() {
     return {
       provider_id: null,
-      licenses: [],
+      terms: [],
       form: {
-        license_key: "",
-        errors: [],
+        overwrite: false,
       },
       provider: {
         provider: "",
@@ -204,38 +138,18 @@ export default {
     };
   },
   beforeRouteUpdate(to, from) {
-    if (to.name === "licenses") {
+    if (to.name === "wizard") {
       this.provider_id = to.params.providerId;
       this.loadProvider();
-      this.loadLicensesList();
+      this.loadTermsList();
     }
   },
   mounted() {
     this.provider_id = this.providerId;
     this.loadProvider();
-    this.loadLicensesList();
+    this.loadTermsList();
   },
   methods: {
-    loadLicensesList(id) {
-      axios
-        .get(thelostasura.ajax_url, {
-          params: {
-            action: "asura_connector_list_licenses",
-            _wpnonce: thelostasura.nonce,
-            provider_id: id ? id : this.provider_id,
-          },
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            this.licenses = response.data.data;
-          }
-        })
-        .catch((error) => {
-          const toastId = this.toast.error(
-            __("Failed to load Licenses list", "asura-connector")
-          );
-        });
-    },
     loadProvider(id) {
       axios
         .get(thelostasura.ajax_url, {
@@ -257,65 +171,53 @@ export default {
         })
         .catch((error) => {
           console.log(error);
-          const toastId = this.toast.error(
+          const localToast = this.toast.error(
             __("Failed to load the provider", "asura-connector")
           );
         });
     },
-    deleteLicense(id) {
-      const toastId = this.toast.info(
-        __("Deleting license ...", "asura-connector"),
-        {
-          timeout: false,
-          icon: LoadingSvg,
-        }
-      );
-
+    loadTermsList(id) {
       axios
-        .post(
-          thelostasura.ajax_url,
-          new URLSearchParams({
-            action: "asura_connector_delete_license",
-            license_id: id,
-            provider_id: this.provider_id,
+        .get(thelostasura.ajax_url, {
+          params: {
+            action: "asura_connector_list_terms",
             _wpnonce: thelostasura.nonce,
-          })
-        )
-        .then((response) => {
-          this.toast.update(toastId, {
-            content: __("License deleted successfully.", "asura-connector"),
-            options: {
-              type: "success",
-              icon: true,
-              timeout: 5000,
-            },
-          });
+            provider_id: id ? id : this.provider_id,
+          },
         })
-        .catch((error) => {
-          this.toast.update(toastId, {
-            content: __("Failed to delete License.", "asura-connector"),
-            options: {
-              type: "error",
-              icon: true,
-              timeout: 5000,
-            },
-          });
-
-          for (const prop in error.response.data.data) {
-            error.response.data.data.forEach((element) => {
-              this.form.errors.push({ message: element.message });
-            });
+        .then((response) => {
+          if (response.status === 200) {
+            this.terms = response.data.data;
           }
         })
-        .then(() => {
-          this.loadLicensesList();
+        .catch((error) => {
+          const localToast = this.toast.error(
+            __("Failed to load Design sets list", "asura-connector")
+          );
         });
     },
-    doSave() {
-      this.form.errors = [];
 
-      const toastId = this.toast.info(
-        __("Adding new license key ...", "asura-connector"),
+    doInstall(id, license_id, term_slug) {
+      this.toastId = this.toast.info(
+        sprintf(
+          /* translators: %s: term_slug  */
+          __("Installing designset: %s", "asura-connector"),
+          term_slug
+        ),
+        {
+          timeout: false,
+          icon: LoadingSvg,
+        }
+      );
+
+      this.installColors(id, license_id, term_slug);
+    },
+    installColors(id, license_id, term_slug) {
+      const localToast = this.toast.info(
+        sprintf(
+          __("Installing Colors", "asura-connector"),
+          this.term_slug
+        ),
         {
           timeout: false,
           icon: LoadingSvg,
@@ -326,46 +228,382 @@ export default {
         .post(
           thelostasura.ajax_url,
           new URLSearchParams({
-            action: "asura_connector_add_license",
-            license_key: this.form.license_key,
-            provider_id: this.provider_id,
             _wpnonce: thelostasura.nonce,
+            action: "asura_connector_wizard_colors",
+            overwrite: this.form.overwrite,
+            provider_id: id ? id : this.provider_id,
+            license_id: license_id,
+            term_slug: term_slug,
           })
         )
         .then((response) => {
-          this.toast.update(toastId, {
-            content: __(
-              "New license key added successfully.",
-              "asura-connector"
-            ),
+          this.toast.update(localToast, {
+            content: __("Colors installed successfully.", "asura-connector"),
             options: {
               type: "success",
               icon: true,
               timeout: 5000,
             },
           });
-
-          this.loadLicensesList();
-          this.form.license_key = "";
         })
         .catch((error) => {
-          this.toast.update(toastId, {
-            content: __("Failed to add new license key.", "asura-connector"),
+          this.toast.update(localToast, {
+            content: __("Failed to install Colors.", "asura-connector"),
             options: {
               type: "error",
               icon: true,
               timeout: 5000,
             },
           });
-
-          for (const prop in error.response.data.data) {
-            error.response.data.data.forEach((element) => {
-              this.form.errors.push({ message: element.message });
-            });
-          }
         })
-        .then(() => {});
+        .then(() => {
+          this.installStylesheets(id, license_id, term_slug);
+        });
     },
+    installStylesheets(id, license_id, term_slug) {
+      const localToast = this.toast.info(
+        sprintf(
+          __("Installing Stylesheets", "asura-connector"),
+          this.term_slug
+        ),
+        {
+          timeout: false,
+          icon: LoadingSvg,
+        }
+      );
+
+      axios
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            _wpnonce: thelostasura.nonce,
+            action: "asura_connector_wizard_stylesheets",
+            overwrite: this.form.overwrite,
+            provider_id: id ? id : this.provider_id,
+            license_id: license_id,
+            term_slug: term_slug,
+          })
+        )
+        .then((response) => {
+          this.toast.update(localToast, {
+            content: __("Stylesheets installed successfully.", "asura-connector"),
+            options: {
+              type: "success",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .catch((error) => {
+          this.toast.update(localToast, {
+            content: __("Failed to install Stylesheets.", "asura-connector"),
+            options: {
+              type: "error",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .then(() => {
+          this.installSettings(id, license_id, term_slug);
+        });
+    },
+    installSettings(id, license_id, term_slug) {
+      const localToast = this.toast.info(
+        sprintf(
+          __("Installing Settings", "asura-connector"),
+          this.term_slug
+        ),
+        {
+          timeout: false,
+          icon: LoadingSvg,
+        }
+      );
+
+      axios
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            _wpnonce: thelostasura.nonce,
+            action: "asura_connector_wizard_settings",
+            overwrite: this.form.overwrite,
+            provider_id: id ? id : this.provider_id,
+            license_id: license_id,
+            term_slug: term_slug,
+          })
+        )
+        .then((response) => {
+          this.toast.update(localToast, {
+            content: __("Settings installed successfully.", "asura-connector"),
+            options: {
+              type: "success",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .catch((error) => {
+          this.toast.update(localToast, {
+            content: __("Failed to install Settings.", "asura-connector"),
+            options: {
+              type: "error",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .then(() => {
+          this.installStylesets(id, license_id, term_slug);
+        });
+    },
+    installStylesets(id, license_id, term_slug) {
+      const localToast = this.toast.info(
+        sprintf(
+          __("Installing Stylesets", "asura-connector"),
+          this.term_slug
+        ),
+        {
+          timeout: false,
+          icon: LoadingSvg,
+        }
+      );
+
+      axios
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            _wpnonce: thelostasura.nonce,
+            action: "asura_connector_wizard_stylesets",
+            overwrite: this.form.overwrite,
+            provider_id: id ? id : this.provider_id,
+            license_id: license_id,
+            term_slug: term_slug,
+          })
+        )
+        .then((response) => {
+          this.toast.update(localToast, {
+            content: __("Stylesets installed successfully.", "asura-connector"),
+            options: {
+              type: "success",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .catch((error) => {
+          this.toast.update(localToast, {
+            content: __("Failed to install Stylesets.", "asura-connector"),
+            options: {
+              type: "error",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .then(() => {
+          this.installSelectors(id, license_id, term_slug);
+        });
+    },
+    installSelectors(id, license_id, term_slug) {
+      const localToast = this.toast.info(
+        sprintf(
+          __("Installing Selectors", "asura-connector"),
+          this.term_slug
+        ),
+        {
+          timeout: false,
+          icon: LoadingSvg,
+        }
+      );
+
+      axios
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            _wpnonce: thelostasura.nonce,
+            action: "asura_connector_wizard_selectors",
+            overwrite: this.form.overwrite,
+            provider_id: id ? id : this.provider_id,
+            license_id: license_id,
+            term_slug: term_slug,
+          })
+        )
+        .then((response) => {
+          this.toast.update(localToast, {
+            content: __("Selectors installed successfully.", "asura-connector"),
+            options: {
+              type: "success",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .catch((error) => {
+          this.toast.update(localToast, {
+            content: __("Failed to install Selectors.", "asura-connector"),
+            options: {
+              type: "error",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .then(() => {
+          this.installTemplates(id, license_id, term_slug);
+        });
+    },
+    installTemplates(id, license_id, term_slug) {
+      const localToast = this.toast.info(
+        sprintf(
+          __("Installing Templates", "asura-connector"),
+          this.term_slug
+        ),
+        {
+          timeout: false,
+          icon: LoadingSvg,
+        }
+      );
+
+      axios
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            _wpnonce: thelostasura.nonce,
+            action: "asura_connector_wizard_templates",
+            overwrite: this.form.overwrite,
+            provider_id: id ? id : this.provider_id,
+            license_id: license_id,
+            term_slug: term_slug,
+          })
+        )
+        .then((response) => {
+          this.toast.update(localToast, {
+            content: __("Templates installed successfully.", "asura-connector"),
+            options: {
+              type: "success",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .catch((error) => {
+          this.toast.update(localToast, {
+            content: __("Failed to install Templates.", "asura-connector"),
+            options: {
+              type: "error",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .then(() => {
+          this.installPages(id, license_id, term_slug);
+        });
+    },
+    installPages(id, license_id, term_slug) {
+      const localToast = this.toast.info(
+        sprintf(
+          __("Installing Pages", "asura-connector"),
+          this.term_slug
+        ),
+        {
+          timeout: false,
+          icon: LoadingSvg,
+        }
+      );
+
+      axios
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            _wpnonce: thelostasura.nonce,
+            action: "asura_connector_wizard_pages",
+            overwrite: this.form.overwrite,
+            provider_id: id ? id : this.provider_id,
+            license_id: license_id,
+            term_slug: term_slug,
+          })
+        )
+        .then((response) => {
+          this.toast.update(localToast, {
+            content: __("Pages installed successfully.", "asura-connector"),
+            options: {
+              type: "success",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .catch((error) => {
+          this.toast.update(localToast, {
+            content: __("Failed to install Pages.", "asura-connector"),
+            options: {
+              type: "error",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .then(() => {
+          this.installClasses(id, license_id, term_slug);
+        });
+    },
+    installClasses(id, license_id, term_slug) {
+      const localToast = this.toast.info(
+        sprintf(
+          __("Installing Classes", "asura-connector"),
+          this.term_slug
+        ),
+        {
+          timeout: false,
+          icon: LoadingSvg,
+        }
+      );
+
+      axios
+        .post(
+          thelostasura.ajax_url,
+          new URLSearchParams({
+            _wpnonce: thelostasura.nonce,
+            action: "asura_connector_wizard_classes",
+            overwrite: this.form.overwrite,
+            provider_id: id ? id : this.provider_id,
+            license_id: license_id,
+            term_slug: term_slug,
+          })
+        )
+        .then((response) => {
+          this.toast.update(localToast, {
+            content: __("Classes installed successfully.", "asura-connector"),
+            options: {
+              type: "success",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .catch((error) => {
+          this.toast.update(localToast, {
+            content: __("Failed to install Classes.", "asura-connector"),
+            options: {
+              type: "error",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        })
+        .then(() => {
+          this.toast.update(this.toastId, {
+            content: __("Installation done.", "asura-connector"),
+            options: {
+              type: "success",
+              icon: true,
+              timeout: 5000,
+            },
+          });
+        });
+    },
+
   },
 };
 </script>

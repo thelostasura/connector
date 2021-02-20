@@ -15,14 +15,14 @@
           clip-rule="evenodd"
         />
       </svg>
-      <span class="ml-2 flex-1 w-0 truncate"> {{ licenseKey }} </span>
+      <span class="ml-2 flex-1 w-0 truncate"> {{ name }}  [<span class="font-bold">{{ slug }}</span>] </span>
     </div>
     <div class="ml-4 flex-shrink-0">
       <button
-        @click="$emit('delete')"
+        @click="$emit('install')"
         class="font-medium text-indigo-600 hover:text-indigo-500"
       >
-        Revoke
+        Install
       </button>
     </div>
   </li>
@@ -30,10 +30,10 @@
 
 <script>
 export default {
-  emits: ["delete"],
+  emits: ["install"],
   props: {
-    id: Number,
-    licenseKey: String,
+    name: String,
+    slug: String,
   },
 };
 </script>
