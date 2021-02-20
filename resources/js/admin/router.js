@@ -4,6 +4,7 @@ import ProvidersList from "./components/providers/ProvidersList.vue";
 import ProvidersRegister from "./components/providers/ProvidersRegister.vue";
 import ProvidersItemEdit from "./components/providers/ProvidersItemEdit.vue";
 import LicensesList from "./components/licenses/LicensesList.vue";
+import WizardList from "./components/wizard/WizardList.vue";
 
 const router = createRouter({
   history: createWebHistory('/wp-admin/admin.php?page=asura-connector#/'),
@@ -48,6 +49,14 @@ const router = createRouter({
       props: true,
       components: {
         default: LicensesList
+      }
+    },
+    {
+      path: '/provider/:providerId/wizard',
+      name: 'wizard',
+      props: true,
+      components: {
+        default: WizardList
       }
     }
   ]

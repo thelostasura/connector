@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use TheLostAsura\Connector\Lib\Asura;
 use TheLostAsura\Connector\Models\License;
 use TheLostAsura\Connector\Models\Provider;
+use TheLostAsura\Connector\Utils\Cache;
 use TheLostAsura\Connector\Utils\DB;
 use WP_Error;
 
@@ -53,6 +54,9 @@ class Admin {
 			],
 			'delete_license'  => [
 				'handler' => [ $this, 'delete_license' ]
+			],
+			'clean_cache'  => [
+				'handler' => [ $this, 'clean_cache' ]
 			],
 		];
 
@@ -643,6 +647,16 @@ class Admin {
 		] );
 
 		wp_send_json_success( $delete );
+
+		wp_die();
+	}
+
+	public function clean_cache() {
+		check_ajax_referer( 'asura-connector-admin' );
+
+		Cache::flush();
+
+		wp_send_json_success( null );
 
 		wp_die();
 	}

@@ -4,7 +4,7 @@ Donate link: https://thelostasura.com/donate?utm_source=connector
 Tags: oxygen builder, license, design set, ecommerce, easy digital download, woocommerce
 Requires at least: 5.5
 Tested up to: 5.6
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -46,6 +46,12 @@ design set from your seller. Please ask your design set seller for complete info
 == Changelog ==
 
 For more information, see [Releases](https://thelostasura.com/changelog?utm_source=connector).
+
+= 3.0.1 =
+
+Release Date: February 25th, 2021
+
+* New: Install Wizard
 
 = 3.0.0 =
 

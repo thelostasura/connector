@@ -20,12 +20,12 @@
             />
           </svg>
         </router-link>
-        {{ __("License", "asura-connector") }}
+        {{ __("Install Wizard", "asura-connector") }}
       </h3>
       <p class="mt-1 max-w-2xl text-sm text-gray-500">
         {{
           __(
-            "Manage license keys to access design set from this provider.",
+            "Install a design set from this provider.",
             "asura-connector"
           )
         }}
@@ -45,7 +45,7 @@
             <ul
               class="border border-gray-200 rounded-md divide-y divide-gray-200"
             >
-              <licensesItem
+              <WizardItem
                 v-for="license in licenses"
                 :key="license.id"
                 :id="license.id"
@@ -156,13 +156,13 @@
 </template>
 
 <script>
-import LicensesItem from "./LicensesItem.vue";
+import WizardItem from "./WizardItem.vue";
 import { useToast } from "vue-toastification";
 import LoadingSvg from "../../UI/LoadingSvg.vue";
 
 export default {
   components: {
-    LicensesItem,
+    WizardItem,
   },
   setup() {
     const toast = useToast();
