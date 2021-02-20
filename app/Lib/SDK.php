@@ -132,4 +132,19 @@ class SDK {
 		], "/oxygenbuilder/colors", $provider );
 	}
 
+	/**
+	 *
+	 * @param object $provider
+	 * @param string $hash
+	 * @param string $term_slug
+	 *
+	 * @return mixed
+	 */
+	public function oxygenbuilder_stylesheets( $provider, $hash, $term_slug ) {
+		return $this->remoteRequest( 'get', [
+			'hash'      => $hash,
+			'term_slug' => $term_slug,
+		], "/oxygenbuilder/stylesheets", $provider );
+	}
+
 }

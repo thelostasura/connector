@@ -64,9 +64,9 @@ class Admin {
 			'wizard_colors'  => [
 				'handler' => [ $this, 'wizard_colors' ]
 			],
-			// 'wizard_'  => [
-			// 	'handler' => [ $this, 'wizard_' ]
-			// ],
+			'wizard_stylesheets'  => [
+				'handler' => [ $this, 'wizard_stylesheets' ]
+			],
 			// 'wizard_'  => [
 			// 	'handler' => [ $this, 'wizard_' ]
 			// ],
@@ -383,6 +383,247 @@ class Admin {
 			set_transient('oxygen_vsb_source_color_map', $sourceColorMap);
 	
 		}
+
+		wp_send_json_success( null );
+
+		wp_die();
+	}
+
+
+
+	/**
+	 * @see ct_setup_default_stylesheets
+	 */
+	public function wizard_stylesheets() {
+		check_ajax_referer( 'asura-connector-admin' );
+
+		if ( empty( $_REQUEST['provider_id'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'missing_field',
+					__( 'The provider id is required', 'asura-connector' )
+				),
+				400
+			);
+		} else if ( ! is_numeric( $_REQUEST['provider_id'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'invalid_field',
+					__( 'The provider id should numeric', 'asura-connector' )
+				),
+				400
+			);
+		}
+
+		if ( empty( $_REQUEST['license_id'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'missing_field',
+					__( 'The license id is required', 'asura-connector' )
+				),
+				400
+			);
+		} else if ( ! is_numeric( $_REQUEST['license_id'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'invalid_field',
+					__( 'The license id should numeric', 'asura-connector' )
+				),
+				400
+			);
+		}
+
+		if ( empty( $_REQUEST['term_slug'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'missing_field',
+					__( 'The term slug is required', 'asura-connector' )
+				),
+				400
+			);
+		} else if ( ! is_string( $_REQUEST['term_slug'] ) ) {
+			wp_send_json_error(
+				new WP_Error(
+					'invalid_field',
+					__( 'The term slug should string', 'asura-connector' )
+				),
+				400
+			);
+		}
+
+		$provider_id = $_REQUEST['provider_id'];
+		$license_id = $_REQUEST['license_id'];
+		$term_slug = $_REQUEST['term_slug'];
+		$overwrite = $_REQUEST['overwrite'] === 'true';
+
+		$provider = (object) DB::get( Provider::TABLE_NAME, [
+			'id [Int]',
+			'provider',
+			'site_title',
+			'api_key',
+			'api_secret',
+			'endpoint',
+			'version',
+			'status [Bool]',
+		], [
+			'id' => $provider_id,
+		] );
+
+		if ( ! $provider ) {
+			wp_send_json_error(
+				new WP_Error(
+					'record_not_exist',
+					__( 'The provider id is not exist', 'asura-connector' )
+				),
+				404
+			);
+		}
+
+		$license = (object) DB::get( License::TABLE_NAME, [
+			'id [Int]',
+			'provider_id',
+			'hash',
+		],
+		[
+			'provider_id' => $provider_id,
+			'id'          => $license_id,
+		] );
+
+		if ( ! $license ) {
+			wp_send_json_error(
+				new WP_Error(
+					'record_not_exist',
+					__( 'The license id is not exist', 'asura-connector' )
+				),
+				404
+			);
+		}
+
+		$cache = Cache::remember( "stylesheets_{$license->provider_id}_{$license->id}_{$term_slug}", Carbon::now()->addHour(), function () use ( $provider, $license, $term_slug ) {
+			$response = Asura::oxygenbuilder_stylesheets( $provider, $license->hash, $term_slug );
+
+			if ( $response->status() !== 200 ) {
+				error_log( "asura-connector [error]: couldn't retrieve stylesheets for license id {$license->id} and term slug {$term_slug}. http error code: {$response->status()}" );
+
+				return null;
+			}
+
+			return json_decode( $response->body(), true )['data'];
+		} );
+
+		if ( ! $cache ) {
+			wp_send_json_error(
+				new WP_Error(
+					'asura_connection_error',
+					__( "Couldn't retrieve stylesheets, please contact design set provider or plugin developer", 'asura-connector' )
+				),
+				500
+			);
+		}
+
+		$folderName = sanitize_text_field($term_slug);
+		$stylesheets = $cache;
+
+		if(!is_array($stylesheets)) {
+			wp_send_json_error(
+				new WP_Error(
+					'invalid_data_type',
+					__( "Couldn't retrieve stylesheets, please contact design set provider or plugin developer", 'asura-connector' )
+				),
+				500
+			);
+		}
+
+		// all the incoming stylesheets should go under a folder with the name of the source site
+
+		// append to existing style sheets
+		$existing = get_option('ct_style_sheets', []);
+
+		// find the topmost ID value in the existing stylesheets.
+		$id = 0;
+		$folder_id = false;
+		// lets assume that this is not the old data, for now
+		foreach($existing as $key => $value) {
+			if(is_array($value) && isset($value['id']) && intval($value['id']) > $id) {
+				$id = intval($value['id']);
+			}
+
+			// in the process also look for a folder that has the name same as $folderName
+			// if such a folder already exist, grab its ID. 
+			if(isset($value['folder']) && intval($value['folder']) === 1  && $value['name'] === $folderName) {
+				$folder_id = $value['id'];
+			}
+		}
+		
+
+		$processedStylesheets = [];
+
+		// if a folder with the name of the $folderName does not exist
+		// create a new folder in the incoming data, with the name of the source site.
+
+		if($folder_id === false) {
+			$folder_id = ++$id;
+			$processedStylesheets[] = [ 'id' => $folder_id, 'name' => $folderName, 'folder' => 1, 'status' => 1 ];
+		}
+
+		//convert old style data and assign the new ID's
+		foreach($stylesheets as $key => $value) {
+			if(!is_array($value)) { // if it is the old style sheets data
+
+				$processedStylesheets[] = [ 'id' => ++$id, 'name' => $key, 'css' => $value, 'parent' => $folder_id, 'status' => 1 ];
+
+			} else {
+
+				// if it is not a folder
+				if(!isset($value['folder']) || intval($value['folder']) !== 1) {
+					$value['id'] = ++$id; // replace the id in the new style data as well
+					$value['parent'] = $folder_id; // make it the child of the new parent
+
+					$processedStylesheets[] = $value;
+				}
+				
+			}
+		}
+
+		// now if we are keeping the existing data
+		if(is_array($existing) && !$overwrite) {
+			// disable all existing folders
+			foreach($existing as $key => $item) {
+				if(isset($item['folder']) && intval($item['folder']) === 1) {
+					// unless the folder has the same name as that of $folderName
+					if($item['name'] !== $folderName) {
+						$existing[$key]['status'] = 0;
+					}
+				}
+				else { // if it is a stylesheet
+
+					// if an incoming stylsheet has the same name as this one? delete this
+					$remove = false;
+
+					foreach($processedStylesheets as $incoming) {
+						
+						if(!$remove && (!isset($incoming['folder']) || intval($incoming['folder']) === 0) && $incoming['name'] === $item['name']) {
+							
+							$remove = true;
+						}
+					}
+
+					if($remove) {
+						unset($existing[$key]);
+					} // else if it does not belong to a folder
+					elseif(!isset($item['parent']) || intval($item['parent']) === 0) {
+
+						$existing[$key]['parent'] = -1; // disable it
+						
+					}
+				}
+			}
+
+			$processedStylesheets = array_merge($existing, $processedStylesheets);
+
+		}
+
+		update_option('ct_style_sheets', $processedStylesheets, get_option("oxygen_options_autoload"));
 
 		wp_send_json_success( null );
 
