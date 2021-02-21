@@ -147,4 +147,94 @@ class SDK {
 		], "/oxygenbuilder/stylesheets", $provider );
 	}
 
+	/**
+	 *
+	 * @param object $provider
+	 * @param string $hash
+	 * @param string $term_slug
+	 *
+	 * @return mixed
+	 */
+	public function oxygenbuilder_settings( $provider, $hash, $term_slug ) {
+		return $this->remoteRequest( 'get', [
+			'hash'      => $hash,
+			'term_slug' => $term_slug,
+		], "/oxygenbuilder/settings", $provider );
+	}
+
+	/**
+	 *
+	 * @param object $provider
+	 * @param string $hash
+	 * @param string $term_slug
+	 *
+	 * @return mixed
+	 */
+	public function oxygenbuilder_stylesets( $provider, $hash, $term_slug ) {
+		return $this->remoteRequest( 'get', [
+			'hash'      => $hash,
+			'term_slug' => $term_slug,
+		], "/oxygenbuilder/stylesets", $provider );
+	}
+
+	/**
+	 *
+	 * @param object $provider
+	 * @param string $hash
+	 * @param string $term_slug
+	 *
+	 * @return mixed
+	 */
+	public function oxygenbuilder_selectors( $provider, $hash, $term_slug ) {
+		return $this->remoteRequest( 'get', [
+			'hash'      => $hash,
+			'term_slug' => $term_slug,
+		], "/oxygenbuilder/selectors", $provider );
+	}
+
+	/**
+	 *
+	 * @param object $provider
+	 * @param string $hash
+	 * @param string $term_slug
+	 *
+	 * @return mixed
+	 */
+	public function oxygenbuilder_templates( $provider, $hash, $term_slug ) {
+		return $this->remoteRequest( 'get', [
+			'hash'      => $hash,
+			'term_slug' => $term_slug,
+		], "/oxygenbuilder/templates", $provider );
+	}
+
+	/**
+	 *
+	 * @param object $provider
+	 * @param string $hash
+	 * @param string $term_slug
+	 *
+	 * @return mixed
+	 */
+	public function oxygenbuilder_pages( $provider, $hash, $term_slug ) {
+		return $this->remoteRequest( 'get', [
+			'hash'      => $hash,
+			'term_slug' => $term_slug,
+		], "/oxygenbuilder/pages", $provider );
+	}
+
+	/**
+	 *
+	 * @param object $provider
+	 * @param string $hash
+	 * @param string $term_slug
+	 *
+	 * @return mixed
+	 */
+	public function oxygenbuilder_classes( $provider, $hash, $term_slug ) {
+		return $this->remoteRequest( 'get', [
+			'hash'      => $hash,
+			'term_slug' => $term_slug,
+		], "/oxygenbuilder/classes", $provider );
+	}
+
 }
