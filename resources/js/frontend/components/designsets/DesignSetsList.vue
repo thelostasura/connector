@@ -243,7 +243,7 @@ export default {
           if (response.status === 200) {
             oxygen.addPage(
               response.data.data,
-              `${this.route_params.termSlug}${this.route_params.providerId}${this.route_params.licenseId}`
+              `${this.route_params.termSlug}`
             );
           }
         })
@@ -276,7 +276,7 @@ export default {
             oxygen.addComponent(
               response.data.data,
               item.id,
-              `${this.route_params.termSlug}${this.route_params.providerId}${this.route_params.licenseId}`
+              `${this.route_params.termSlug}`
             );
           }
         })
