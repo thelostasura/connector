@@ -39,7 +39,13 @@ class Frontend {
 	 * @return string
 	 */
 	public function render_frontend() {
-		echo '<div id="thelostasura-app"></div>';
+		echo <<<EOT
+		<script>
+			document.querySelector(".oxygen-toolbar-panels")
+				.insertAdjacentHTML("beforeend", '<div id="thelostasura-app" class="oxygen-dom-tree-button oxygen-toolbar-button"></div>');
+		</script>
+		<div id="thelostasura-layout"></div>
+EOT;
 	}
 
 }
