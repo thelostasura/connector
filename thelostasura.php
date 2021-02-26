@@ -6,7 +6,7 @@
  * @wordpress-plugin
  * Plugin Name:         Asura Connector
  * Description:         Access to design sets collections managed by the Asura plugin.
- * Version:             3.0.1
+ * Version:             3.0.2
  * Author:              thelostasura
  * Author URI:          https://thelostasura.com
  * Requires at least:   5.5
@@ -20,7 +20,7 @@
  * @link                https://thelostasura.com
  * @since               1.0.0
  * @copyright           2020 thelostasura
- * @version             3.0.1
+ * @version             3.0.2
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -41,7 +41,7 @@ final class Asura_Connector {
 	 *
 	 * @var string
 	 */
-	public $version = '3.0.1';
+	public $version = '3.0.2';
 	public $db_version = '001';
 
 

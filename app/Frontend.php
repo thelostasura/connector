@@ -41,8 +41,12 @@ class Frontend {
 	public function render_frontend() {
 		echo <<<EOT
 		<script>
-			document.querySelector(".oxygen-toolbar-panels")
-				.insertAdjacentHTML("beforeend", '<div id="thelostasura-app" class="oxygen-dom-tree-button oxygen-toolbar-button"></div>');
+			let tla_app = document.createElement('div');
+			tla_app.id = 'thelostasura-app';
+			tla_app.className = 'oxygen-dom-tree-button oxygen-toolbar-button';
+			tla_app.style.padding = 'unset';
+			tla_app.style.border = 0;
+			document.querySelector('.oxygen-left-button-wrap').after(tla_app);
 		</script>
 		<div id="thelostasura-layout"></div>
 EOT;

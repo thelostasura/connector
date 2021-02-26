@@ -1,6 +1,18 @@
 const mix = require('laravel-mix');
 const tailwindcss = require('tailwindcss');
 
+
+mix.webpackConfig(webpack => { 
+  return {
+      plugins: [
+          new webpack.DefinePlugin({
+              // '__VUE_OPTIONS_API__': 'true',
+              '__VUE_PROD_DEVTOOLS__': 'false'
+          })
+      ]
+  }
+});
+
 mix
   .js('resources/js/admin/main.js', 'public/js/admin.js')
   .js('resources/js/frontend/main.js', 'public/js/frontend.js')

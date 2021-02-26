@@ -2,7 +2,7 @@
   <svg
     @click="isVisible = !isVisible"
     :class="{ 'animate-pulse': isLoading }"
-    class="w-8 h-8"
+    class="w-8 h-8 mx-5"
     id="Layer_2"
     viewBox="0 0 64 64"
     xmlns="http://www.w3.org/2000/svg"
