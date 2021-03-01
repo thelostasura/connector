@@ -208,7 +208,7 @@ class Admin {
 			return json_decode( $response->body(), true )['data'];
 		} );
 
-		if ( ! $cache ) {
+		if ( $cache === null ) {
 			wp_send_json_error(
 				new WP_Error(
 					'asura_connection_error',
@@ -489,7 +489,7 @@ class Admin {
 			return json_decode( $response->body(), true )['data'];
 		} );
 
-		if ( ! $cache ) {
+		if ( $cache === null ) {
 			wp_send_json_error(
 				new WP_Error(
 					'asura_connection_error',
@@ -728,7 +728,7 @@ class Admin {
 			return json_decode( $response->body(), true )['data'];
 		} );
 
-		if ( ! $cache ) {
+		if ( $cache === null ) {
 			wp_send_json_error(
 				new WP_Error(
 					'asura_connection_error',
@@ -908,7 +908,7 @@ class Admin {
 			return json_decode( $response->body(), true )['data'];
 		} );
 
-		if ( ! $cache ) {
+		if ( $cache === null ) {
 			wp_send_json_error(
 				new WP_Error(
 					'asura_connection_error',
@@ -1090,7 +1090,7 @@ class Admin {
 			return json_decode( $response->body(), true )['data'];
 		} );
 
-		if ( ! $cache ) {
+		if ( $cache === null ) {
 			wp_send_json_error(
 				new WP_Error(
 					'asura_connection_error',
@@ -1283,7 +1283,7 @@ class Admin {
 			return json_decode( $response->body(), true )['data'];
 		} );
 
-		if ( ! $cache ) {
+		if ( $cache === null ) {
 			wp_send_json_error(
 				new WP_Error(
 					'asura_connection_error',
@@ -1626,7 +1626,7 @@ class Admin {
 			return json_decode( $response->body(), true )['data'];
 		} );
 
-		if ( ! $cache ) {
+		if ( $cache === null ) {
 			wp_send_json_error(
 				new WP_Error(
 					'asura_connection_error',
@@ -1863,7 +1863,7 @@ class Admin {
 			return json_decode( $response->body(), true )['data'];
 		} );
 
-		if ( ! $cache ) {
+		if ( $cache === null ) {
 			wp_send_json_error(
 				new WP_Error(
 					'asura_connection_error',
